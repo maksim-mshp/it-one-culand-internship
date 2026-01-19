@@ -54,14 +54,14 @@ func registerSwagger(mux *http.ServeMux) error {
 		return err
 	}
 	apiDir := filepath.Join(wd, "api")
-	mux.HandleFunc("/swagger/swagger.json", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(apiDir, "swagger.json"))
+	mux.HandleFunc("/swagger/openapi.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(apiDir, "openapi.json"))
 	})
-	mux.HandleFunc("/swagger/swagger.yaml", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(apiDir, "swagger.yaml"))
+	mux.HandleFunc("/swagger/openapi.yml", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(apiDir, "openapi.yml"))
 	})
 	mux.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("/swagger/swagger.json"),
+		httpSwagger.URL("/swagger/openapi.json"),
 	))
 	return nil
 }
