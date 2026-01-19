@@ -1,9 +1,30 @@
 basePath: /
-host: localhost:8080
+definitions:
+  Internship:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
 info:
   contact: {}
-  description: API для управления стажировками.
   title: Internship API
-  version: "1.0"
-paths: {}
+paths:
+  /internships:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Internship'
+            type: array
+      summary: Получить все стажировки
+      tags:
+      - internship
 swagger: "2.0"

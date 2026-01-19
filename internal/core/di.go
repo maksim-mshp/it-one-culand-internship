@@ -24,7 +24,7 @@ func Start(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := database.RunMigrations(db, "./migrations"); err != nil {
+	if err := database.RunMigrations(db); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,10 @@ func Start(cfg *config.Config) (*App, error) {
 	internshipHttpHandler := internshipHttp.NewHttpHandler(internshipHandlers)
 	internshipHttp.RegisterRoutes(mux, internshipHttpHandler)
 
-	srv := corehttp.NewServer(cfg.Port, mux)
+	srv, err := corehttp.NewServer(cfg.Port, mux)
+	if err != nil {
+		return nil, err
+	}
 
 	return &App{
 		Config:   cfg,

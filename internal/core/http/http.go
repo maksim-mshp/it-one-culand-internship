@@ -6,6 +6,8 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 type ErrorResponse struct {
@@ -31,16 +33,11 @@ func RespondSuccess(w http.ResponseWriter, statusCode int, data interface{}) {
 }
 
 // @title Internship API
-// @version 1.0
-// @description API для управления стажировками
-// @host localhost:8080
 // @BasePath /
-func NewServer(port int, mux *http.ServeMux) *http.Server {
-	mux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("api"))))
-	mux.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("/swagger/swagger.json"), // путь к спецификации
-	))
-
+func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
+	if err := registerSwagger(mux); err != nil {
+		return nil, err
+	}
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		RespondError(w, http.StatusNotFound, "not found")
 	})
@@ -48,5 +45,23 @@ func NewServer(port int, mux *http.ServeMux) *http.Server {
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
+	}, nil
+}
+
+func registerSwagger(mux *http.ServeMux) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
+	apiDir := filepath.Join(wd, "api")
+	mux.HandleFunc("/swagger/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(apiDir, "swagger.json"))
+	})
+	mux.HandleFunc("/swagger/swagger.yaml", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(apiDir, "swagger.yaml"))
+	})
+	mux.Handle("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/swagger.json"),
+	))
+	return nil
 }
