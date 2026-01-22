@@ -1,4 +1,4 @@
-package http
+package v1
 
 type InternshipResponse struct {
 	ID    int    `json:"id"`

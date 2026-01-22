@@ -6,7 +6,7 @@ import (
 	"culand-internship/internal/core/database"
 	corehttp "culand-internship/internal/core/http"
 	internshipApp "culand-internship/internal/internship/app"
-	internshipHttp "culand-internship/internal/internship/infra/http"
+	internshipV1Http "culand-internship/internal/internship/infra/http/v1"
 	internshipPostgres "culand-internship/internal/internship/infra/postgres"
 	"database/sql"
 	"net/http"
@@ -32,8 +32,8 @@ func Start(cfg *config.Config) (*App, error) {
 
 	internshipRepo := internshipPostgres.NewRepository(db)
 	internshipHandlers := internshipApp.BuildHandlers(internshipRepo)
-	internshipHttpHandler := internshipHttp.NewHttpHandler(internshipHandlers)
-	internshipHttp.RegisterRoutes(mux, internshipHttpHandler)
+	internshipV1HttpHandler := internshipV1Http.NewHttpHandler(internshipHandlers)
+	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler)
 
 	srv, err := corehttp.NewServer(cfg.Port, mux)
 	if err != nil {

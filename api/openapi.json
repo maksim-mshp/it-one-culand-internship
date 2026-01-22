@@ -4,9 +4,9 @@
         "title": "Internship API",
         "contact": {}
     },
-    "basePath": "/",
+    "basePath": "/api/v1",
     "paths": {
-        "/internships": {
+        "/api/v1/internships": {
             "get": {
                 "consumes": [
                     "application/json"

@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api/v1
 definitions:
   Internship:
     properties:
@@ -11,7 +11,7 @@ info:
   contact: {}
   title: Internship API
 paths:
-  /internships:
+  /api/v1/internships:
     get:
       consumes:
       - application/json

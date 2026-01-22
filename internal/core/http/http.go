@@ -34,7 +34,7 @@ func RespondSuccess(w http.ResponseWriter, statusCode int, data interface{}) {
 }
 
 // @title Internship API
-// @BasePath /
+// @BasePath /api/v1
 func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	if err := registerSwagger(mux); err != nil {
 		return nil, err
