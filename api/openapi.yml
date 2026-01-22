@@ -1,0 +1,30 @@
+basePath: /api/v1
+definitions:
+  Internship:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Internship API
+paths:
+  /api/v1/internships:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/Internship'
+            type: array
+      summary: Получить все стажировки
+      tags:
+      - internship
+swagger: "2.0"
