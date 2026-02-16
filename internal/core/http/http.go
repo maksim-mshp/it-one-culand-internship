@@ -12,11 +12,7 @@ import (
 	"time"
 )
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-func respondJSON(w http.ResponseWriter, statusCode int, body interface{}) {
+func respondJSON(w http.ResponseWriter, statusCode int, body any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	if body != nil {
@@ -26,22 +22,24 @@ func respondJSON(w http.ResponseWriter, statusCode int, body interface{}) {
 	}
 }
 
-func RespondError(w http.ResponseWriter, statusCode int, msg string) {
-	respondJSON(w, statusCode, ErrorResponse{Error: msg})
-}
-
-func RespondSuccess(w http.ResponseWriter, statusCode int, data interface{}) {
+func RespondSuccess(w http.ResponseWriter, statusCode int, data any) {
 	respondJSON(w, statusCode, data)
 }
 
-// @title Internship API
+// @title Internships API
 // @BasePath /api/v1
 func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	if err := registerSwagger(mux); err != nil {
 		return nil, err
 	}
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		RespondError(w, http.StatusNotFound, "not found")
+		RespondError(w, APIError{
+			StatusCode: http.StatusNotFound,
+			Error:      "NOT_FOUND",
+			Details: map[string]any{
+				"path": req.URL.Path,
+			},
+		})
 	})
 
 	handler := middleware.Logging(mux)

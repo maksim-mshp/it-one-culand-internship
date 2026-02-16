@@ -1,5 +1,13 @@
 basePath: /api/v1
 definitions:
+  APIError:
+    properties:
+      details:
+        additionalProperties: {}
+        type: object
+      error:
+        type: string
+    type: object
   Internship:
     properties:
       description:
@@ -25,10 +33,6 @@ info:
 paths:
   /internships:
     get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -37,6 +41,26 @@ paths:
               $ref: '#/definitions/Internship'
             type: array
       summary: Получить все стажировки
+      tags:
+      - internship
+  /internships/{id}:
+    get:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Internship'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/APIError'
+      summary: Получить стажировку по ID
       tags:
       - internship
 swagger: "2.0"

@@ -8,12 +8,6 @@
     "paths": {
         "/internships": {
             "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "internship"
                 ],
@@ -30,9 +24,52 @@
                     }
                 }
             }
+        },
+        "/internships/{id}": {
+            "get": {
+                "tags": [
+                    "internship"
+                ],
+                "summary": "Получить стажировку по ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID стажировки",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Internship"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "APIError": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "Internship": {
             "type": "object",
             "properties": {
