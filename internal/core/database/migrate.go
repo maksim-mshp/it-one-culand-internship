@@ -1,17 +1,30 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/pgx"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5/stdlib"
 	"log"
+
+	"github.com/golang-migrate/migrate/v4"
+	pgxmigrate "github.com/golang-migrate/migrate/v4/database/pgx/v5"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func RunMigrations(db *sql.DB) error {
-	driver, err := pgx.WithInstance(db, &pgx.Config{})
+func RunMigrations(pool *pgxpool.Pool) error {
+	sqlDB := stdlib.OpenDBFromPool(pool)
+	needCloseSQLDB := true
+	defer func() {
+		if !needCloseSQLDB {
+			return
+		}
+		if err := sqlDB.Close(); err != nil {
+			log.Printf("failed close db: %v", err)
+		}
+	}()
+
+	driver, err := pgxmigrate.WithInstance(sqlDB, &pgxmigrate.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to create migrate driver: %w", err)
 	}
@@ -25,11 +38,21 @@ func RunMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to create migrate instance: %w", err)
 	}
 
+	needCloseSQLDB = false
+	defer func() {
+		sourceErr, dbErr := m.Close()
+		if sourceErr != nil {
+			log.Printf("failed close migration source: %v", sourceErr)
+		}
+		if dbErr != nil {
+			log.Printf("failed close migration database: %v", dbErr)
+		}
+	}()
+
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("migrations failed: %w", err)
 	}
 
 	log.Println("migrations applied successfully")
-
 	return nil
 }

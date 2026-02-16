@@ -8,14 +8,14 @@ import (
 	internshipApp "culand-internship/internal/internship/app"
 	internshipV1Http "culand-internship/internal/internship/infra/http/v1"
 	internshipPostgres "culand-internship/internal/internship/infra/postgres"
-	"database/sql"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http"
 	"time"
 )
 
 type App struct {
 	Config   *config.Config
-	Database *sql.DB
+	Database *pgxpool.Pool
 	Server   *http.Server
 }
 
@@ -55,9 +55,6 @@ func (a *App) Stop(ctx context.Context) error {
 		return err
 	}
 
-	if err := a.Database.Close(); err != nil {
-		return err
-	}
-
+	a.Database.Close()
 	return nil
 }

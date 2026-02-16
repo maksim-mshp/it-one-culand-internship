@@ -1,13 +1,14 @@
 package database
 
 import (
+	"context"
 	"culand-internship/internal/core/config"
-	"database/sql"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func NewPostgres(config config.Database) (*sql.DB, error) {
+func NewPostgres(config config.Database) (*pgxpool.Pool, error) {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
 		config.User,
 		config.Password,
@@ -15,15 +16,13 @@ func NewPostgres(config config.Database) (*sql.DB, error) {
 		config.Port,
 		config.Database,
 	)
-	db, err := sql.Open("pgx", dsn)
+	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db: %w", err)
 	}
-	if err := db.Ping(); err != nil {
-		if err := db.Close(); err != nil {
-			return nil, fmt.Errorf("failed to close db: %w", err)
-		}
+	if err := pool.Ping(context.Background()); err != nil {
+		pool.Close()
 		return nil, fmt.Errorf("failed to ping db: %w", err)
 	}
-	return db, nil
+	return pool, nil
 }

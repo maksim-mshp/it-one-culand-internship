@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type ErrorResponse struct {
@@ -46,8 +47,11 @@ func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	handler := middleware.Logging(mux)
 
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: handler,
+		Addr:         fmt.Sprintf(":%d", port),
+		Handler:      handler,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}, nil
 }
 

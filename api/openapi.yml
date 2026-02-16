@@ -2,8 +2,20 @@ basePath: /api/v1
 definitions:
   Internship:
     properties:
+      description:
+        type: string
+      goals:
+        items:
+          type: string
+        type: array
       id:
         type: integer
+      label:
+        type: string
+      skills:
+        items:
+          type: string
+        type: array
       title:
         type: string
     type: object
@@ -11,7 +23,7 @@ info:
   contact: {}
   title: Internship API
 paths:
-  /api/v1/internships:
+  /internships:
     get:
       consumes:
       - application/json

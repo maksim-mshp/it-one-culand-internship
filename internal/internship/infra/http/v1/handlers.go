@@ -20,7 +20,7 @@ func NewHttpHandler(handlers *app.Handlers) *Handler {
 // @Accept json
 // @Produce json
 // @Success 200 {array} InternshipResponse
-// @Router /api/v1/internships [get]
+// @Router /internships [get]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	all, err := h.handlers.GetAll.Handle(r.Context(), app.GetAllInternshipsQuery{})
 	if err != nil {
