@@ -94,3 +94,39 @@ func (r *Repository) GetByID(ctx context.Context, id int) (*domain.Internship, e
 
 	return &internship, nil
 }
+
+func (r *Repository) Create(ctx context.Context, internship *domain.Internship) (int, error) {
+	const query = `
+		WITH
+		new_internship AS (
+			INSERT INTO culand_internship.internships (title, label, description)
+				VALUES ($1, $2, $3)
+				RETURNING id
+		),
+		insert_skills AS (
+			INSERT INTO culand_internship.internship_skills (internship_id, skill_name)
+				SELECT new_internship.id, UNNEST($4::TEXT[])
+				FROM new_internship
+		),
+		insert_goals AS (
+			INSERT INTO culand_internship.internship_goals (internship_id, goal_name)
+				SELECT new_internship.id, UNNEST($5::TEXT[])
+				FROM new_internship
+		)
+		SELECT id FROM new_internship
+	`
+
+	var id int
+	row := r.db.QueryRow(ctx, query,
+		internship.Title,
+		internship.Label,
+		internship.Description,
+		internship.Skills,
+		internship.Goals,
+	)
+	err := row.Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}

@@ -28,3 +28,31 @@ func NewGetInternshipByIDHandler(repo Repository) *GetInternshipByIDHandler {
 func (h *GetInternshipByIDHandler) Handle(ctx context.Context, _ GetInternshipByIDQuery, id int) (*domain.Internship, error) {
 	return h.repo.GetByID(ctx, id)
 }
+
+type CreateInternshipHandler struct {
+	repo Repository
+}
+
+func NewCreateInternshipHandler(repo Repository) *CreateInternshipHandler {
+	return &CreateInternshipHandler{repo: repo}
+}
+
+func (h *CreateInternshipHandler) Handle(ctx context.Context, cmd CreateInternshipCommand) (*domain.Internship, error) {
+	internship, err := domain.NewInternship(
+		cmd.Title,
+		cmd.Label,
+		cmd.Description,
+		cmd.Skills,
+		cmd.Goals,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := h.repo.Create(ctx, internship)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.repo.GetByID(ctx, id)
+}

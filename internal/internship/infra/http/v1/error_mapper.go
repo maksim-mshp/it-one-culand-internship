@@ -19,5 +19,29 @@ func mapError(err error) corehttp.APIError {
 		}
 	}
 
+	var titleTooShort domain.TitleTooShortError
+	if errors.As(err, &titleTooShort) {
+		return corehttp.APIError{
+			StatusCode: http.StatusUnprocessableEntity,
+			Error:      titleTooShort.ErrorCode,
+			Details: map[string]any{
+				"currentLength": titleTooShort.CurrentLength,
+				"minLength":     titleTooShort.MinLength,
+			},
+		}
+	}
+
+	var titleTooLong domain.TitleTooLongError
+	if errors.As(err, &titleTooLong) {
+		return corehttp.APIError{
+			StatusCode: http.StatusUnprocessableEntity,
+			Error:      titleTooLong.ErrorCode,
+			Details: map[string]any{
+				"currentLength": titleTooLong.CurrentLength,
+				"maxLength":     titleTooLong.MaxLength,
+			},
+		}
+	}
+
 	return corehttp.ErrInternal
 }

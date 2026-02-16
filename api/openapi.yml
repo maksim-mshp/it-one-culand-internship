@@ -1,45 +1,99 @@
-basePath: /api/v1
-definitions:
-  APIError:
-    properties:
-      details:
-        additionalProperties: {}
-        type: object
-      error:
-        type: string
-    type: object
-  Internship:
-    properties:
-      description:
-        type: string
-      goals:
-        items:
+components:
+  schemas:
+    APIError:
+      properties:
+        details:
+          additionalProperties: {}
+          type: object
+        error:
           type: string
-        type: array
-      id:
-        type: integer
-      label:
-        type: string
-      skills:
-        items:
+      type: object
+    InternshipCreateDto:
+      properties:
+        description:
           type: string
-        type: array
-      title:
-        type: string
-    type: object
+        goals:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        label:
+          type: string
+        skills:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        title:
+          type: string
+      type: object
+    InternshipDto:
+      properties:
+        description:
+          type: string
+        goals:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        id:
+          type: integer
+        label:
+          type: string
+        skills:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        title:
+          type: string
+      type: object
+externalDocs:
+  description: ""
+  url: ""
 info:
-  contact: {}
-  title: Internship API
+  title: Internships API
+  version: ""
+openapi: 3.1.0
 paths:
+  /admin/internships:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipCreateDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+      summary: Создать стажировку
+      tags:
+      - internship
   /internships:
     get:
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InternshipDto'
+                type: array
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/Internship'
-            type: array
       summary: Получить все стажировки
       tags:
       - internship
@@ -50,17 +104,23 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        schema:
+          type: integer
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipDto'
           description: OK
-          schema:
-            $ref: '#/definitions/Internship'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/APIError'
       summary: Получить стажировку по ID
       tags:
       - internship
-swagger: "2.0"
+servers:
+- url: /api/v1

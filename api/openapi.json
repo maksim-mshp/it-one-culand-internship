@@ -1,103 +1,200 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "title": "Internship API",
-        "contact": {}
+    "components": {
+        "schemas": {
+            "APIError": {
+                "properties": {
+                    "details": {
+                        "additionalProperties": {},
+                        "type": "object"
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "InternshipCreateDto": {
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "goals": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "skills": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "InternshipDto": {
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "goals": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "skills": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            }
+        }
     },
-    "basePath": "/api/v1",
+    "info": {
+        "title": "Internships API",
+        "version": ""
+    },
+    "externalDocs": {
+        "description": "",
+        "url": ""
+    },
     "paths": {
-        "/internships": {
-            "get": {
-                "tags": [
-                    "internship"
-                ],
-                "summary": "Получить все стажировки",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/Internship"
+        "/admin/internships": {
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InternshipCreateDto",
+                                "summary": "internship",
+                                "description": "Стажировка"
                             }
                         }
+                    },
+                    "description": "Стажировка",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternshipDto"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
                     }
-                }
+                },
+                "summary": "Создать стажировку",
+                "tags": [
+                    "internship"
+                ]
+            }
+        },
+        "/internships": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/InternshipDto"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    }
+                },
+                "summary": "Получить все стажировки",
+                "tags": [
+                    "internship"
+                ]
             }
         },
         "/internships/{id}": {
             "get": {
-                "tags": [
-                    "internship"
-                ],
-                "summary": "Получить стажировку по ID",
                 "parameters": [
                     {
-                        "type": "integer",
                         "description": "ID стажировки",
-                        "name": "id",
                         "in": "path",
-                        "required": true
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/Internship"
-                        }
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternshipDto"
+                                }
+                            }
+                        },
+                        "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/APIError"
-                        }
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
                     }
-                }
+                },
+                "summary": "Получить стажировку по ID",
+                "tags": [
+                    "internship"
+                ]
             }
         }
     },
-    "definitions": {
-        "APIError": {
-            "type": "object",
-            "properties": {
-                "details": {
-                    "type": "object",
-                    "additionalProperties": {}
-                },
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
-        "Internship": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "goals": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "label": {
-                    "type": "string"
-                },
-                "skills": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
+    "openapi": "3.1.0",
+    "servers": [
+        {
+            "url": "/api/v1"
         }
-    }
+    ]
 }

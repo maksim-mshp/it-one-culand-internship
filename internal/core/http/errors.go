@@ -16,3 +16,8 @@ var ErrInternal = APIError{
 	StatusCode: http.StatusInternalServerError,
 	Error:      "INTERNAL_ERROR",
 }
+
+var ErrInvalidBody = APIError{
+	StatusCode: http.StatusBadRequest,
+	Error:      "INVALID_BODY",
+}

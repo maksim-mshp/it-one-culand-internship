@@ -19,7 +19,7 @@ func NewHttpHandler(handlers *app.Handlers) *Handler {
 // @Summary		Получить все стажировки
 // @Tags		internship
 // @Success		200 {array} InternshipResponse
-// @Router		/internships [get]
+// @Router		/internships [GET]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	all, err := h.handlers.GetAll.Handle(r.Context(), app.GetAllInternshipsQuery{})
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Param		id path int true "ID стажировки"
 // @Success		200 {object} InternshipResponse
 // @Failure		400 {object} APIError
-// @Router		/internships/{id} [get]
+// @Router		/internships/{id} [GET]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
@@ -59,6 +59,37 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	internship, err := h.handlers.GetByID.Handle(r.Context(), app.GetInternshipByIDQuery{}, id)
 	if err != nil {
 		log.Printf("failed to get internship: %v", err)
+		corehttp.RespondError(w, mapError(err))
+		return
+	}
+
+	dto := MapInternship(internship)
+	corehttp.RespondSuccess(w, http.StatusOK, dto)
+}
+
+// @Summary		Создать стажировку
+// @Tags		internship
+// @Param		internship body InternshipCreateDto true "Стажировка"
+// @Success		200 {object} InternshipResponse
+// @Failure		400 {object} APIError
+// @Router		/admin/internships [POST]
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
+	var internshipDto InternshipCreateRequest
+	apiErr := corehttp.ParseJSONBody(r, &internshipDto)
+	if apiErr != nil {
+		corehttp.RespondError(w, *apiErr)
+		return
+	}
+
+	internship, err := h.handlers.Create.Handle(r.Context(), app.CreateInternshipCommand{
+		Title:       internshipDto.Title,
+		Label:       internshipDto.Label,
+		Description: internshipDto.Description,
+		Skills:      internshipDto.Skills,
+		Goals:       internshipDto.Goals,
+	})
+	if err != nil {
+		log.Printf("failed to create internship: %v", err)
 		corehttp.RespondError(w, mapError(err))
 		return
 	}

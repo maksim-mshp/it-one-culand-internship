@@ -7,4 +7,12 @@ type InternshipResponse struct {
 	Description string   `json:"description"`
 	Skills      []string `json:"skills"`
 	Goals       []string `json:"goals"`
-} // @name Internship
+} // @name InternshipDto
+
+type InternshipCreateRequest struct {
+	Title       string   `json:"title"`
+	Label       string   `json:"label"`
+	Description string   `json:"description"`
+	Skills      []string `json:"skills"`
+	Goals       []string `json:"goals"`
+} // @name InternshipCreateDto
