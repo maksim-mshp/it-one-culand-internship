@@ -49,7 +49,7 @@ func RespondSuccess(w http.ResponseWriter, statusCode int, data any) {
 }
 
 // @title Internships API
-// @BasePath /api/v1
+// @Servers /api/v1
 // @OpenAPIVersion 3.0.1
 func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	if err := registerSwagger(mux); err != nil {

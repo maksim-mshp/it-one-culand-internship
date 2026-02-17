@@ -8,6 +8,17 @@ import (
 )
 
 func mapError(err error) corehttp.APIError {
+	var fieldMissing domain.MissingFieldError
+	if errors.As(err, &fieldMissing) {
+		return corehttp.APIError{
+			StatusCode: http.StatusNotFound,
+			Error:      fieldMissing.ErrorCode,
+			Details: map[string]any{
+				"field": fieldMissing.Field,
+			},
+		}
+	}
+
 	var notFound domain.NotFoundError
 	if errors.As(err, &notFound) {
 		return corehttp.APIError{

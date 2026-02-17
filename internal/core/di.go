@@ -3,9 +3,9 @@ package core
 import (
 	"context"
 	"culand-internship/internal/core/config"
-	"culand-internship/internal/core/database"
 	corehttp "culand-internship/internal/core/http"
-	internshipApp "culand-internship/internal/internship/app"
+	"culand-internship/internal/core/postgres"
+	internshipApp "culand-internship/internal/internship/app/handlers"
 	internshipV1Http "culand-internship/internal/internship/infra/http/v1"
 	internshipPostgres "culand-internship/internal/internship/infra/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,18 +20,20 @@ type App struct {
 }
 
 func Start(cfg *config.Config) (*App, error) {
-	db, err := database.NewPostgres(cfg.Database)
+	db, err := postgres.NewPostgres(cfg.Database)
 	if err != nil {
 		return nil, err
 	}
-	if err := database.RunMigrations(db); err != nil {
+	if err = postgres.RunMigrations(db); err != nil {
 		return nil, err
 	}
 
 	mux := http.NewServeMux()
+	coreTxManager := postgres.NewPgxTxManager(db)
 
 	internshipRepo := internshipPostgres.NewRepository(db)
-	internshipHandlers := internshipApp.BuildHandlers(internshipRepo)
+	internshipTxRunner := internshipPostgres.NewTxRunner(coreTxManager)
+	internshipHandlers := internshipApp.BuildHandlers(internshipRepo, internshipTxRunner)
 	internshipV1HttpHandler := internshipV1Http.NewHttpHandler(internshipHandlers)
 	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler)
 

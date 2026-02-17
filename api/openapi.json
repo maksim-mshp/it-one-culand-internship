@@ -13,7 +13,7 @@
                 },
                 "type": "object"
             },
-            "InternshipCreateDto": {
+            "InternshipDto": {
                 "properties": {
                     "description": {
                         "type": "string"
@@ -24,6 +24,9 @@
                         },
                         "type": "array",
                         "uniqueItems": false
+                    },
+                    "id": {
+                        "type": "integer"
                     },
                     "label": {
                         "type": "string"
@@ -41,7 +44,7 @@
                 },
                 "type": "object"
             },
-            "InternshipDto": {
+            "InternshipRequestDto": {
                 "properties": {
                     "description": {
                         "type": "string"
@@ -52,9 +55,6 @@
                         },
                         "type": "array",
                         "uniqueItems": false
-                    },
-                    "id": {
-                        "type": "integer"
                     },
                     "label": {
                         "type": "string"
@@ -89,7 +89,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/InternshipCreateDto",
+                                "$ref": "#/components/schemas/InternshipRequestDto",
                                 "summary": "internship",
                                 "description": "Стажировка"
                             }
@@ -121,6 +121,132 @@
                     }
                 },
                 "summary": "Создать стажировку",
+                "tags": [
+                    "internship"
+                ]
+            }
+        },
+        "/admin/internships/{id}": {
+            "patch": {
+                "parameters": [
+                    {
+                        "description": "ID стажировки",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InternshipRequestDto",
+                                "summary": "internship",
+                                "description": "Стажировка"
+                            }
+                        }
+                    },
+                    "description": "Стажировка",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternshipDto"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Обновить стажировку",
+                "tags": [
+                    "internship"
+                ]
+            },
+            "put": {
+                "parameters": [
+                    {
+                        "description": "ID стажировки",
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InternshipRequestDto",
+                                "summary": "internship",
+                                "description": "Стажировка"
+                            }
+                        }
+                    },
+                    "description": "Стажировка",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InternshipDto"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
+                    }
+                },
+                "summary": "Обновить стажировку",
                 "tags": [
                     "internship"
                 ]
@@ -182,6 +308,16 @@
                             }
                         },
                         "description": "Bad Request"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Not Found"
                     }
                 },
                 "summary": "Получить стажировку по ID",
@@ -191,10 +327,5 @@
             }
         }
     },
-    "openapi": "3.1.0",
-    "servers": [
-        {
-            "url": "/api/v1"
-        }
-    ]
+    "openapi": "3.1.0"
 }

@@ -49,3 +49,15 @@ func NewTitleTooLongError(currentLength, maxLength int) TitleTooLongError {
 func (e TitleTooLongError) Error() string {
 	return fmt.Sprintf("internship title too long (current: %d, max: %d)", e.CurrentLength, e.MaxLength)
 }
+
+type MissingFieldError struct {
+	ErrorCode string
+	Field     string
+}
+
+func NewMissingFieldError(field string) MissingFieldError {
+	return MissingFieldError{"INTERNSHIP_MISSING_FIELD", field}
+}
+func (e MissingFieldError) Error() string {
+	return fmt.Sprintf("filed %s is missing", e.Field)
+}

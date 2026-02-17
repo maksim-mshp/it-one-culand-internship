@@ -1,15 +1,14 @@
-package database
+package postgres
 
 import (
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/stdlib"
-	"log"
-
 	"github.com/golang-migrate/migrate/v4"
 	pgxmigrate "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"log"
 )
 
 func RunMigrations(pool *pgxpool.Pool) error {
@@ -30,7 +29,7 @@ func RunMigrations(pool *pgxpool.Pool) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://internal/core/database/migrations",
+		"file://internal/core/postgres/migrations",
 		"pgx",
 		driver,
 	)
@@ -49,7 +48,11 @@ func RunMigrations(pool *pgxpool.Pool) error {
 		}
 	}()
 
-	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	if err = m.Up(); err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
+			log.Println("migrations: no changes detected")
+			return nil
+		}
 		return fmt.Errorf("migrations failed: %w", err)
 	}
 

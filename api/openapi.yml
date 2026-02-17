@@ -8,25 +8,6 @@ components:
         error:
           type: string
       type: object
-    InternshipCreateDto:
-      properties:
-        description:
-          type: string
-        goals:
-          items:
-            type: string
-          type: array
-          uniqueItems: false
-        label:
-          type: string
-        skills:
-          items:
-            type: string
-          type: array
-          uniqueItems: false
-        title:
-          type: string
-      type: object
     InternshipDto:
       properties:
         description:
@@ -38,6 +19,25 @@ components:
           uniqueItems: false
         id:
           type: integer
+        label:
+          type: string
+        skills:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        title:
+          type: string
+      type: object
+    InternshipRequestDto:
+      properties:
+        description:
+          type: string
+        goals:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
         label:
           type: string
         skills:
@@ -62,7 +62,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InternshipCreateDto'
+              $ref: '#/components/schemas/InternshipRequestDto'
               description: Стажировка
               summary: internship
         description: Стажировка
@@ -81,6 +81,85 @@ paths:
                 $ref: '#/components/schemas/APIError'
           description: Bad Request
       summary: Создать стажировку
+      tags:
+      - internship
+  /admin/internships/{id}:
+    patch:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipRequestDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      summary: Обновить стажировку
+      tags:
+      - internship
+    put:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipRequestDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      summary: Обновить стажировку
       tags:
       - internship
   /internships:
@@ -119,8 +198,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIError'
           description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
       summary: Получить стажировку по ID
       tags:
       - internship
-servers:
-- url: /api/v1

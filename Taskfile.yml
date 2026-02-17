@@ -1,0 +1,20 @@
+version: 3
+
+dotenv: ['.env']
+
+silent: true
+
+tasks:
+  run:
+    cmd: go run ./cmd/internship | true
+
+  openapi:
+    cmds:
+      - swag init -g internal/core/http/http.go --output api --outputTypes json,yaml --v3.1
+      - mv api/swagger.json api/openapi.json
+      - mv api/swagger.yaml api/openapi.yml
+
+  install-deps:
+    cmds:
+      - go install github.com/swaggo/swag/v2/cmd/swag@latest
+      - go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
