@@ -31,11 +31,13 @@ func Start(cfg *config.Config) (*App, error) {
 	mux := http.NewServeMux()
 	coreTxManager := postgres.NewPgxTxManager(db)
 
+	adminMW := corehttp.RequireAdminMiddleware()
+
 	internshipRepo := internshipPostgres.NewRepository(db)
 	internshipTxRunner := internshipPostgres.NewTxRunner(coreTxManager)
 	internshipHandlers := internshipApp.BuildHandlers(internshipRepo, internshipTxRunner)
 	internshipV1HttpHandler := internshipV1Http.NewHttpHandler(internshipHandlers)
-	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler)
+	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler, adminMW)
 
 	srv, err := corehttp.NewServer(cfg.Port, mux)
 	if err != nil {

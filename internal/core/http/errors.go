@@ -21,3 +21,8 @@ var ErrInvalidBody = APIError{
 	StatusCode: http.StatusBadRequest,
 	Error:      "INVALID_BODY",
 }
+
+var ErrUnauthorized = APIError{
+	StatusCode: http.StatusUnauthorized,
+	Error:      "UNAUTHORIZED",
+}

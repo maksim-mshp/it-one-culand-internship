@@ -1,7 +1,6 @@
 package http
 
 import (
-	"culand-internship/internal/core/http/middleware"
 	"encoding/json"
 	"fmt"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -55,17 +54,9 @@ func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	if err := registerSwagger(mux); err != nil {
 		return nil, err
 	}
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		RespondError(w, APIError{
-			StatusCode: http.StatusNotFound,
-			Error:      "NOT_FOUND",
-			Details: map[string]any{
-				"path": r.URL.Path,
-			},
-		})
-	})
 
-	handler := middleware.Logging(mux)
+	handler := LoggingMiddleware(mux)
+	handler = HTTPErrorsMiddleware(handler)
 
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
