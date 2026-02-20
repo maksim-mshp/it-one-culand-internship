@@ -8,14 +8,18 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func NewPostgres(config config.Database) (*pgxpool.Pool, error) {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
+func MakeConnectionString(config config.Database) string {
+	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
 		config.User,
 		config.Password,
 		config.Host,
 		config.Port,
 		config.Database,
 	)
+}
+
+func NewPostgres(config config.Database) (*pgxpool.Pool, error) {
+	dsn := MakeConnectionString(config)
 	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open db: %w", err)

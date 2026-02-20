@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS internship.internship_goals (
     id            SERIAL PRIMARY KEY,
     internship_id INTEGER      NOT NULL,
     goal_name     VARCHAR(255) NOT NULL,
-    CONSTRAINT fk_internship_skills FOREIGN KEY (internship_id)
+    CONSTRAINT fk_internship_goals FOREIGN KEY (internship_id)
         REFERENCES internship.internships (id) ON DELETE CASCADE
 );

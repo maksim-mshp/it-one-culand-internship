@@ -1,35 +1,33 @@
 package domain
 
 type Internship struct {
-	ID          int
-	Title       string
-	Label       string
-	Description string
-	Skills      []string
-	Goals       []string
+	id   int
+	info InternshipInfo
 }
 
-func NewInternship(title, label, description string, skills, goals []string) (*Internship, error) {
-	internship := Internship{
-		Title:       title,
-		Label:       label,
-		Description: description,
-		Skills:      skills,
-		Goals:       goals,
-	}
-	err := internship.Validate()
-	if err != nil {
-		return nil, err
-	}
-	return &internship, nil
+func NewInternship(info InternshipInfo) (Internship, error) {
+	return Internship{
+		info: info,
+	}, nil
 }
 
-func (i *Internship) Validate() error {
-	if len(i.Title) < 5 {
-		return NewTitleTooShortError(len(i.Title), 5)
+func (i *Internship) ID() int {
+	return i.id
+}
+func (i *Internship) Info() InternshipInfo {
+	return i.info
+}
+
+func (i *Internship) SetID(id int) {
+	i.id = id
+}
+func (i *Internship) UpdateInfo(info InternshipInfo) {
+	i.info = info
+}
+
+func ReconstituteInternship(id int, info InternshipInfo) Internship {
+	return Internship{
+		id:   id,
+		info: info,
 	}
-	if len(i.Title) > 100 {
-		return NewTitleTooLongError(len(i.Title), 100)
-	}
-	return nil
 }

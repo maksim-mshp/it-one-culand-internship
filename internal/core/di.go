@@ -24,7 +24,7 @@ func Start(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err = postgres.RunMigrations(db); err != nil {
+	if err = postgres.RunMigrations(cfg.Database); err != nil {
 		return nil, err
 	}
 

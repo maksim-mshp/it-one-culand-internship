@@ -1,6 +1,8 @@
 package http
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type APIError struct {
 	StatusCode int            `json:"-"`

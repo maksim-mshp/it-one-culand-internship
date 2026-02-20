@@ -16,40 +16,6 @@ func (e NotFoundError) Error() string {
 	return fmt.Sprintf("internship %d not found", e.ID)
 }
 
-type TitleTooShortError struct {
-	ErrorCode     string
-	CurrentLength int
-	MinLength     int
-}
-
-func NewTitleTooShortError(currentLength, minLength int) TitleTooShortError {
-	return TitleTooShortError{
-		"INTERNSHIP_TITLE_TOO_SHORT",
-		currentLength,
-		minLength,
-	}
-}
-func (e TitleTooShortError) Error() string {
-	return fmt.Sprintf("internship title too short (current: %d, min: %d)", e.CurrentLength, e.MinLength)
-}
-
-type TitleTooLongError struct {
-	ErrorCode     string
-	CurrentLength int
-	MaxLength     int
-}
-
-func NewTitleTooLongError(currentLength, maxLength int) TitleTooLongError {
-	return TitleTooLongError{
-		"INTERNSHIP_TITLE_TOO_SHORT",
-		currentLength,
-		maxLength,
-	}
-}
-func (e TitleTooLongError) Error() string {
-	return fmt.Sprintf("internship title too long (current: %d, max: %d)", e.CurrentLength, e.MaxLength)
-}
-
 type MissingFieldError struct {
 	ErrorCode string
 	Field     string
@@ -59,5 +25,26 @@ func NewMissingFieldError(field string) MissingFieldError {
 	return MissingFieldError{"INTERNSHIP_MISSING_FIELD", field}
 }
 func (e MissingFieldError) Error() string {
-	return fmt.Sprintf("filed %s is missing", e.Field)
+	return fmt.Sprintf("field %s is missing", e.Field)
+}
+
+type InvalidFieldLengthError struct {
+	ErrorCode     string
+	Field         string
+	MinLength     int
+	MaxLength     int
+	CurrentLength int
+}
+
+func NewInvalidFieldLengthError(field string, min, max, cur int) InvalidFieldLengthError {
+	return InvalidFieldLengthError{
+		"INVALID_FIELD_LENGTH",
+		field,
+		min,
+		max,
+		cur,
+	}
+}
+func (e InvalidFieldLengthError) Error() string {
+	return fmt.Sprintf("field %s has invalid length (cur: %d, min: %d, max: %d)", e.Field, e.CurrentLength, e.MinLength, e.MaxLength)
 }

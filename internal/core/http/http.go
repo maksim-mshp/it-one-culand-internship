@@ -2,10 +2,12 @@ package http
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"io"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,14 +21,41 @@ func ParseJSONBody(r *http.Request, data any) *APIError {
 		}
 	}()
 
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
+	if ct := r.Header.Get("Content-Type"); ct != "" {
+		mediaType, _, err := mime.ParseMediaType(ct)
+		if err != nil || mediaType != "application/json" {
+			return &APIError{
+				StatusCode: http.StatusUnsupportedMediaType,
+				Error:      "UNSUPPORTED_MEDIA_TYPE",
+			}
+		}
+	}
+
+	const maxBodyBytes = 1024 * 1024
+	r.Body = http.MaxBytesReader(nil, r.Body, maxBodyBytes)
+
+	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
+
+	if err := dec.Decode(data); err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			return &APIError{
+				StatusCode: http.StatusRequestEntityTooLarge,
+				Error:      "REQUEST_ENTITY_TOO_LARGE",
+			}
+		}
 		return &ErrInvalidBody
 	}
 
-	err = json.Unmarshal(body, data)
-	if err != nil {
-		log.Printf("failed to parse json: %v", err)
+	if err := dec.Decode(&struct{}{}); err != io.EOF {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			return &APIError{
+				StatusCode: http.StatusRequestEntityTooLarge,
+				Error:      "REQUEST_ENTITY_TOO_LARGE",
+			}
+		}
 		return &ErrInvalidBody
 	}
 
@@ -43,13 +72,12 @@ func respondJSON(w http.ResponseWriter, statusCode int, body any) {
 	}
 }
 
-func RespondSuccess(w http.ResponseWriter, statusCode int, data any) {
+func Respond(w http.ResponseWriter, statusCode int, data any) {
 	respondJSON(w, statusCode, data)
 }
 
 // @title Internships API
 // @Servers /api/v1
-// @OpenAPIVersion 3.0.1
 func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	if err := registerSwagger(mux); err != nil {
 		return nil, err

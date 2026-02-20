@@ -1,7 +1,6 @@
 package http
 
 import (
-	"bytes"
 	"culand-internship/internal/core/security"
 	"log"
 	"mime"
@@ -10,32 +9,13 @@ import (
 )
 
 type responseWriter struct {
-	dst    http.ResponseWriter
-	header http.Header
-	body   bytes.Buffer
+	http.ResponseWriter
 	status int
-}
-
-func (w *responseWriter) Header() http.Header {
-	return w.header
 }
 
 func (w *responseWriter) WriteHeader(code int) {
 	w.status = code
-	if w.dst != nil {
-		w.dst.WriteHeader(code)
-	}
-}
-
-func (w *responseWriter) Write(p []byte) (int, error) {
-	if w.status == 0 {
-		w.status = http.StatusOK
-	}
-
-	if w.dst != nil {
-		return w.dst.Write(p)
-	}
-	return w.body.Write(p)
+	w.ResponseWriter.WriteHeader(code)
 }
 
 func (w *responseWriter) StatusCode() int {
@@ -45,11 +25,16 @@ func (w *responseWriter) StatusCode() int {
 	return w.status
 }
 
+func (w *responseWriter) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := &responseWriter{
-			dst:    w,
-			header: w.Header(),
+			ResponseWriter: w,
 		}
 
 		next.ServeHTTP(rw, r)
@@ -60,50 +45,74 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func HTTPErrorsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rw := &responseWriter{
-			header: make(http.Header),
-		}
+type errorInterceptor struct {
+	http.ResponseWriter
+	req         *http.Request
+	wroteHeader bool
+	hijacked    bool
+}
 
-		next.ServeHTTP(rw, r)
+func (w *errorInterceptor) WriteHeader(code int) {
+	if w.wroteHeader {
+		return
+	}
+	w.wroteHeader = true
 
-		contentType := rw.Header().Get("Content-Type")
-		status := rw.StatusCode()
+	ct := w.Header().Get("Content-Type")
+	if (code == http.StatusNotFound || code == http.StatusMethodNotAllowed) && !isJSON(ct) {
+		w.hijacked = true
 
-		if status == http.StatusNotFound && !isJSON(contentType) {
-			RespondError(w, APIError{
+		if code == http.StatusNotFound {
+			RespondError(w.ResponseWriter, APIError{
 				StatusCode: http.StatusNotFound,
 				Error:      "NOT_FOUND",
 				Details: map[string]any{
-					"path": r.URL.Path,
+					"path": w.req.URL.Path,
 				},
 			})
 			return
 		}
 
-		if status == http.StatusMethodNotAllowed && !isJSON(contentType) {
-			allow := strings.Split(rw.Header().Get("Allow"), ", ")
+		allow := w.Header().Get("Allow")
+		w.ResponseWriter.Header().Set("Allow", allow)
+		RespondError(w.ResponseWriter, APIError{
+			StatusCode: http.StatusMethodNotAllowed,
+			Error:      "METHOD_NOT_ALLOWED",
+			Details: map[string]any{
+				"method": w.req.Method,
+				"path":   w.req.URL.Path,
+				"allow":  strings.Split(allow, ", "),
+			},
+		})
+		return
+	}
 
-			RespondError(w, APIError{
-				StatusCode: http.StatusMethodNotAllowed,
-				Error:      "METHOD_NOT_ALLOWED",
-				Details: map[string]any{
-					"method": r.Method,
-					"path":   r.URL.Path,
-					"allow":  allow,
-				},
-			})
-			return
-		}
+	w.ResponseWriter.WriteHeader(code)
+}
 
-		for k, vals := range rw.Header() {
-			for _, v := range vals {
-				w.Header().Add(k, v)
-			}
+func (w *errorInterceptor) Write(p []byte) (int, error) {
+	if w.hijacked {
+		return len(p), nil
+	}
+	if !w.wroteHeader {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(p)
+}
+
+func (w *errorInterceptor) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
+func HTTPErrorsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		interceptor := &errorInterceptor{
+			ResponseWriter: w,
+			req:            r,
 		}
-		w.WriteHeader(status)
-		_, _ = w.Write(rw.body.Bytes())
+		next.ServeHTTP(interceptor, r)
 	})
 }
 

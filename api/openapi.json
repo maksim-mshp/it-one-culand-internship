@@ -99,7 +99,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -107,9 +107,9 @@
                                 }
                             }
                         },
-                        "description": "OK"
+                        "description": "Created"
                     },
-                    "400": {
+                    "401": {
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -117,7 +117,17 @@
                                 }
                             }
                         },
-                        "description": "Bad Request"
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Unprocessable Entity"
                     }
                 },
                 "summary": "Создать стажировку",
@@ -173,6 +183,16 @@
                         },
                         "description": "Bad Request"
                     },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
                     "404": {
                         "content": {
                             "application/json": {
@@ -182,6 +202,16 @@
                             }
                         },
                         "description": "Not Found"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Unprocessable Entity"
                     }
                 },
                 "summary": "Обновить стажировку",
@@ -235,6 +265,16 @@
                         },
                         "description": "Bad Request"
                     },
+                    "401": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Unauthorized"
+                    },
                     "404": {
                         "content": {
                             "application/json": {
@@ -244,6 +284,16 @@
                             }
                         },
                         "description": "Not Found"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/APIError"
+                                }
+                            }
+                        },
+                        "description": "Unprocessable Entity"
                     }
                 },
                 "summary": "Обновить стажировку",

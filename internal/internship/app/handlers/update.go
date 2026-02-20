@@ -15,41 +15,42 @@ func NewUpdateInternshipHandler(txRunner app.TxRunner) *UpdateInternshipHandler 
 }
 
 func (h *UpdateInternshipHandler) Handle(ctx context.Context, cmd app.UpdateInternshipCommand) (*domain.Internship, error) {
-	if cmd.Title == nil {
-		return nil, domain.NewMissingFieldError("title")
+	title, err := domain.NewTitle(cmd.Title)
+	if err != nil {
+		return nil, err
 	}
-	if cmd.Label == nil {
-		label := ""
-		cmd.Label = &label
+	label, err := domain.NewLabel(cmd.Label)
+	if err != nil {
+		return nil, err
 	}
-	if cmd.Description == nil {
-		description := ""
-		cmd.Description = &description
+	desc, err := domain.NewDescription(cmd.Description)
+	if err != nil {
+		return nil, err
 	}
-	if cmd.Skills == nil {
-		skills := make([]string, 0)
-		cmd.Skills = &skills
+	skills, err := domain.NewSkills(cmd.Skills)
+	if err != nil {
+		return nil, err
 	}
-	if cmd.Goals == nil {
-		goals := make([]string, 0)
-		cmd.Goals = &goals
-	}
-
-	internship := &domain.Internship{
-		ID:          cmd.ID,
-		Title:       *cmd.Title,
-		Label:       *cmd.Label,
-		Description: *cmd.Description,
-		Skills:      *cmd.Skills,
-		Goals:       *cmd.Goals,
-	}
-	err := internship.Validate()
+	goals, err := domain.NewGoals(cmd.Goals)
 	if err != nil {
 		return nil, err
 	}
 
+	info, err := domain.NewInternshipInfo(title, label, desc, skills, goals)
+	if err != nil {
+		return nil, err
+	}
+
+	i, err := domain.NewInternship(info)
+	if err != nil {
+		return nil, err
+	}
+	internship := &i
+
+	internship.SetID(cmd.ID)
+
 	err = h.txRunner.WithinTx(ctx, func(ctx context.Context, repo app.Repository) error {
-		err := repo.Update(ctx, internship)
+		err = repo.Update(ctx, internship)
 		if err != nil {
 			return err
 		}
@@ -76,40 +77,49 @@ func (h *PatchInternshipHandler) Handle(ctx context.Context, cmd app.UpdateInter
 	internship := &domain.Internship{}
 
 	err := h.txRunner.WithinTx(ctx, func(ctx context.Context, repo app.Repository) error {
-		cur, err := repo.GetByIDForUpdate(ctx, cmd.ID)
+		var err error
+		internship, err = repo.GetByIDForUpdate(ctx, cmd.ID)
 		if err != nil {
 			return err
 		}
 
-		if cmd.Title == nil {
-			cmd.Title = &cur.Title
+		title := internship.Info().Title()
+		label := internship.Info().Label()
+		desc := internship.Info().Description()
+		skills := internship.Info().Skills()
+		goals := internship.Info().Goals()
+
+		if cmd.Title != nil {
+			if title, err = domain.NewTitle(cmd.Title); err != nil {
+				return err
+			}
 		}
-		if cmd.Label == nil {
-			cmd.Label = &cur.Label
+		if cmd.Label != nil {
+			if label, err = domain.NewLabel(cmd.Label); err != nil {
+				return err
+			}
 		}
-		if cmd.Description == nil {
-			cmd.Description = &cur.Description
+		if cmd.Description != nil {
+			if desc, err = domain.NewDescription(cmd.Description); err != nil {
+				return err
+			}
 		}
-		if cmd.Skills == nil {
-			cmd.Skills = &cur.Skills
+		if cmd.Skills != nil {
+			if skills, err = domain.NewSkills(cmd.Skills); err != nil {
+				return err
+			}
 		}
-		if cmd.Goals == nil {
-			cmd.Goals = &cur.Goals
+		if cmd.Goals != nil {
+			if goals, err = domain.NewGoals(cmd.Goals); err != nil {
+				return err
+			}
 		}
 
-		internship = &domain.Internship{
-			ID:          cmd.ID,
-			Title:       *cmd.Title,
-			Label:       *cmd.Label,
-			Description: *cmd.Description,
-			Skills:      *cmd.Skills,
-			Goals:       *cmd.Goals,
-		}
-
-		err = internship.Validate()
+		info, err := domain.NewInternshipInfo(title, label, desc, skills, goals)
 		if err != nil {
 			return err
 		}
+		internship.UpdateInfo(info)
 
 		err = repo.Update(ctx, internship)
 		if err != nil {

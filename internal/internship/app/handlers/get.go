@@ -26,6 +26,6 @@ func NewGetInternshipByIDHandler(repo app.Repository) *GetInternshipByIDHandler 
 	return &GetInternshipByIDHandler{repo: repo}
 }
 
-func (h *GetInternshipByIDHandler) Handle(ctx context.Context, _ app.GetInternshipByIDQuery, id int) (*domain.Internship, error) {
-	return h.repo.GetByID(ctx, id)
+func (h *GetInternshipByIDHandler) Handle(ctx context.Context, q app.GetInternshipByIDQuery) (*domain.Internship, error) {
+	return h.repo.GetByID(ctx, q.ID)
 }

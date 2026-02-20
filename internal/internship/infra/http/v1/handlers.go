@@ -4,6 +4,7 @@ import (
 	corehttp "culand-internship/internal/core/http"
 	"culand-internship/internal/internship/app"
 	"culand-internship/internal/internship/app/handlers"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -34,7 +35,7 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 		allDto = append(allDto, MapInternship(i))
 	}
 
-	corehttp.RespondSuccess(w, http.StatusOK, allDto)
+	corehttp.Respond(w, http.StatusOK, allDto)
 }
 
 // @Summary		Получить стажировку по ID
@@ -58,7 +59,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	internship, err := h.handlers.GetByID.Handle(r.Context(), app.GetInternshipByIDQuery{}, id)
+	internship, err := h.handlers.GetByID.Handle(r.Context(), app.GetInternshipByIDQuery{ID: id})
 	if err != nil {
 		log.Printf("failed to get internship: %v", err)
 		corehttp.RespondError(w, mapError(err))
@@ -66,14 +67,15 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dto := MapInternship(internship)
-	corehttp.RespondSuccess(w, http.StatusOK, dto)
+	corehttp.Respond(w, http.StatusOK, dto)
 }
 
 // @Summary		Создать стажировку
 // @Tags		internship
 // @Param		internship body InternshipRequestDto true "Стажировка"
-// @Success		200 {object} InternshipDto
-// @Failure		400 {object} APIError
+// @Success		201 {object} InternshipDto
+// @Failure		401 {object} APIError
+// @Failure		422 {object} APIError
 // @Router		/admin/internships [POST]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var internshipDto InternshipRequestDto
@@ -97,7 +99,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dto := MapInternship(internship)
-	corehttp.RespondSuccess(w, http.StatusOK, dto)
+	location := fmt.Sprintf("/api/v1/internships/%d", internship.ID())
+	w.Header().Set("Location", location)
+	corehttp.Respond(w, http.StatusCreated, dto)
 }
 
 // @Summary		Обновить стажировку
@@ -106,7 +110,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Param		internship body InternshipRequestDto true "Стажировка"
 // @Success		200 {object} InternshipDto
 // @Failure		400 {object} APIError
+// @Failure		401 {object} APIError
 // @Failure		404 {object} APIError
+// @Failure		422 {object} APIError
 // @Router		/admin/internships/{id} [PUT]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
@@ -145,7 +151,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dto := MapInternship(internship)
-	corehttp.RespondSuccess(w, http.StatusOK, dto)
+	corehttp.Respond(w, http.StatusOK, dto)
 }
 
 // @Summary		Обновить стажировку
@@ -154,7 +160,9 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 // @Param		internship body InternshipRequestDto true "Стажировка"
 // @Success		200 {object} InternshipDto
 // @Failure		400 {object} APIError
+// @Failure		401 {object} APIError
 // @Failure		404 {object} APIError
+// @Failure		422 {object} APIError
 // @Router		/admin/internships/{id} [PATCH]
 func (h *Handler) Patch(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
@@ -193,5 +201,5 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dto := MapInternship(internship)
-	corehttp.RespondSuccess(w, http.StatusOK, dto)
+	corehttp.Respond(w, http.StatusOK, dto)
 }
