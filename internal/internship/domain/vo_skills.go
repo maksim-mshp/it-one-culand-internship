@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"culand-internship/internal/core/validation"
+	"culand-internship/internal/shared/validation"
 )
 
 type Skills struct {

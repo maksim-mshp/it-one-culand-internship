@@ -14,3 +14,11 @@ func UpdateVO[T any, VO any](ptr *T, factory func(T) (VO, error), cur VO) (VO, e
 	}
 	return factory(*ptr)
 }
+
+func ReconstituteVO[T any, VO any](ptr *T, factory func(T) VO) VO {
+	var val T
+	if ptr != nil {
+		val = *ptr
+	}
+	return factory(val)
+}

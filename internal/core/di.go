@@ -25,6 +25,14 @@ func Start(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	needCloseDB := true
+	defer func() {
+		if needCloseDB {
+			db.Close()
+		}
+	}()
+
 	if err = postgres.RunMigrations(cfg.Database); err != nil {
 		return nil, err
 	}
@@ -52,6 +60,8 @@ func Start(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	needCloseDB = false
 
 	return &App{
 		Config:   cfg,

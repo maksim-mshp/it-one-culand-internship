@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"culand-internship/internal/core/validation"
+	"culand-internship/internal/shared/validation"
 )
 
 type Description struct {
@@ -9,7 +9,7 @@ type Description struct {
 }
 
 func NewDescription(v string) (Description, error) {
-	val, err := validation.ValidateStringLength("description", v, 5, 50)
+	val, err := validation.ValidateStringLength("description", v, 5, 100)
 	if err != nil && err.CurrentLength != 0 {
 		return Description{}, *err
 	}

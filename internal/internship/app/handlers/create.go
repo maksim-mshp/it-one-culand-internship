@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"context"
-	"culand-internship/internal/core/utils"
 	"culand-internship/internal/internship/app"
 	"culand-internship/internal/internship/domain"
+	"culand-internship/internal/shared/utils"
 )
 
 type CreateHandler struct {

@@ -1,5 +1,7 @@
 package security
 
+import "crypto/subtle"
+
 func IsValidInternal(tokenString, secretKey string) bool {
-	return tokenString == secretKey
+	return subtle.ConstantTimeCompare([]byte(tokenString), []byte(secretKey)) == 1
 }

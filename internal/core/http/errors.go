@@ -1,7 +1,7 @@
 package http
 
 import (
-	"culand-internship/internal/core/validation"
+	"culand-internship/internal/shared/validation"
 	"errors"
 	"net/http"
 )

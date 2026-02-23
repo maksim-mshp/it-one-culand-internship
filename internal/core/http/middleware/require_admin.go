@@ -10,10 +10,9 @@ import (
 func RequireAdminMiddleware(secretKey string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			auth := r.Header.Get("Authorization")
-			const prefix = "Bearer "
+			parts := strings.Fields(r.Header.Get("Authorization"))
 
-			if !strings.HasPrefix(auth, prefix) {
+			if !strings.EqualFold(parts[0], "Bearer") {
 				w.Header().Set("WWW-Authenticate", "Bearer realm=\"API\"")
 				corehttp.RespondError(w, corehttp.APIError{
 					StatusCode: http.StatusUnauthorized,
@@ -22,8 +21,7 @@ func RequireAdminMiddleware(secretKey string) func(http.Handler) http.Handler {
 				return
 			}
 
-			token := strings.TrimPrefix(auth, prefix)
-			isAdmin, err := security.IsAdminRole(token, secretKey)
+			isAdmin, err := security.IsAdminRole(parts[1], secretKey)
 
 			if err != nil {
 				w.Header().Set("WWW-Authenticate", "Bearer realm=\"API\"")
