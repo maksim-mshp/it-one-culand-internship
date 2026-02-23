@@ -14,6 +14,7 @@ type Handlers struct {
 	GetByIDAdmin  *GetByIDAdminHandler
 	UpdateStatus  *UpdateStatusHandler
 	CheckIsActive *CheckIsActiveHandler
+	Delete        *DeleteHandler
 }
 
 func BuildHandlers(repo app.Repository, txRunner app.TxRunner) *Handlers {
@@ -27,5 +28,6 @@ func BuildHandlers(repo app.Repository, txRunner app.TxRunner) *Handlers {
 		GetByIDAdmin:  NewGetByIDAdminHandler(repo),
 		UpdateStatus:  NewUpdateStatusHandler(txRunner),
 		CheckIsActive: NewCheckIsActiveHandler(repo),
+		Delete:        NewDeleteHandler(repo),
 	}
 }

@@ -148,6 +148,11 @@ const (
 	UpdateStatusQuery = `
 		UPDATE internship.internships
 		SET status = $2
-		WHERE id = $1
+		WHERE id = $1;
+	`
+
+	DeleteQuery = `
+		DELETE FROM internship.internships
+		WHERE id = $1;
 	`
 )

@@ -13,6 +13,7 @@ type Repository interface {
 	GetByIDForUpdate(ctx context.Context, id int) (*domain.Internship, error)
 	GetAllActive(ctx context.Context) ([]*domain.Internship, error)
 	UpdateStatus(ctx context.Context, id int, status domain.Status) error
+	Delete(ctx context.Context, id int) error
 }
 
 type TxRunner interface {

@@ -21,3 +21,7 @@ type UpdateStatusCommand struct {
 	ID     int
 	Status *string
 }
+
+type DeleteCommand struct {
+	ID int
+}

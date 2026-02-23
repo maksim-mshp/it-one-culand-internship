@@ -47,7 +47,8 @@ func Start(cfg *config.Config) (*App, error) {
 	adminMW := middleware.RequireAdminMiddleware(cfg.JWTToken)
 	internalMW := middleware.RequireInternalMiddleware(cfg.InternalToken)
 
-	handler := middleware.LoggingMiddleware(mux)
+	handler := middleware.RecoverMiddleware(mux)
+	handler = middleware.LoggingMiddleware(handler)
 	handler = middleware.HTTPErrorsMiddleware(handler)
 
 	internshipRepo := internshipPostgres.NewRepository(db)

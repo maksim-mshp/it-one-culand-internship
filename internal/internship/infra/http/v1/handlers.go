@@ -229,6 +229,38 @@ func (h *Handler) GetAllAdmin(w http.ResponseWriter, r *http.Request) {
 	corehttp.Respond(w, http.StatusOK, allDto)
 }
 
+// @Summary		Удалить стажировку
+// @Tags		admin
+// @Param		id path int true "ID стажировки"
+// @Success		204
+// @Failure		400 {object} APIError
+// @Failure		404 {object} APIError
+// @Router		/admin/internships/{id} [DELETE]
+// @Security	Bearer
+func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		corehttp.RespondError(w, corehttp.APIError{
+			StatusCode: http.StatusBadRequest,
+			Error:      "INVALID_INTERNSHIP_ID",
+			Details: map[string]any{
+				"id": idStr,
+			},
+		})
+		return
+	}
+
+	err = h.handlers.Delete.Handle(r.Context(), app.DeleteCommand{ID: id})
+	if err != nil {
+		log.Printf("failed to delete internship: %v", err)
+		corehttp.RespondError(w, mapError(err))
+		return
+	}
+
+	corehttp.Respond(w, http.StatusNoContent, nil)
+}
+
 // @Summary		Получить стажировку по ID
 // @Tags		admin
 // @Param		id path int true "ID стажировки"

@@ -184,3 +184,14 @@ func (r *Repository) UpdateStatus(ctx context.Context, id int, status domain.Sta
 	}
 	return nil
 }
+
+func (r *Repository) Delete(ctx context.Context, id int) error {
+	tag, err := r.db.Exec(ctx, DeleteQuery, id)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return domain.NewNotFoundError(id)
+	}
+	return nil
+}
