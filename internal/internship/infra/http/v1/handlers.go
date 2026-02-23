@@ -308,3 +308,38 @@ func (h *Handler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	dto := MapInternshipAdmin(internship)
 	corehttp.Respond(w, http.StatusOK, dto)
 }
+
+// @Summary		Проверить статус стажировки (активна или нет)
+// @Tags		internal
+// @Param		id path int true "ID стажировки"
+// @Success		200 {object} InternshipInternalStatus
+// @Failure		400 {object} APIError
+// @Failure		401 {object} APIError
+// @Failure		404 {object} APIError
+// @Router		/internal/internships/{id}/status [GET]
+// @Security	Bearer
+func (h *Handler) GetInternalStatus(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		corehttp.RespondError(w, corehttp.APIError{
+			StatusCode: http.StatusBadRequest,
+			Error:      "INVALID_INTERNSHIP_ID",
+			Details: map[string]any{
+				"id": idStr,
+			},
+		})
+		return
+	}
+
+	isActive, err := h.handlers.CheckIsActive.Handle(r.Context(), app.CheckIsActiveQuery{ID: id})
+
+	if err != nil {
+		log.Printf("failed to check internship status: %v", err)
+		corehttp.RespondError(w, mapError(err))
+		return
+	}
+
+	dto := MapInternshipInternalStatus(isActive)
+	corehttp.Respond(w, http.StatusOK, dto)
+}

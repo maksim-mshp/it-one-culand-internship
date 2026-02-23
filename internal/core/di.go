@@ -36,7 +36,9 @@ func Start(cfg *config.Config) (*App, error) {
 		return nil, err
 	}
 
-	adminMW := middleware.RequireAdminMiddleware()
+	adminMW := middleware.RequireAdminMiddleware(cfg.JWTToken)
+	internalMW := middleware.RequireInternalMiddleware(cfg.InternalToken)
+
 	handler := middleware.LoggingMiddleware(mux)
 	handler = middleware.HTTPErrorsMiddleware(handler)
 
@@ -44,7 +46,7 @@ func Start(cfg *config.Config) (*App, error) {
 	internshipTxRunner := internshipPostgres.NewTxRunner(coreTxManager)
 	internshipHandlers := internshipApp.BuildHandlers(internshipRepo, internshipTxRunner)
 	internshipV1HttpHandler := internshipV1Http.NewHttpHandler(internshipHandlers)
-	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler, adminMW)
+	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler, adminMW, internalMW)
 
 	srv, err := corehttp.NewServer(cfg.Port, handler)
 	if err != nil {

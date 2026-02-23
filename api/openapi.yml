@@ -52,6 +52,11 @@ components:
         title:
           type: string
       type: object
+    InternshipInternalStatus:
+      properties:
+        isActive:
+          type: boolean
+      type: object
     InternshipRequestDto:
       properties:
         description:
@@ -78,7 +83,7 @@ components:
       type: object
   securitySchemes:
     Bearer:
-      description: 'Формат: `Bearer jwt_token`'
+      description: 'Формат: `Bearer {token}`'
       in: header
       name: Authorization
       type: apiKey
@@ -334,6 +339,45 @@ paths:
       summary: Обновить статус стажировки
       tags:
       - admin
+  /internal/internships/{id}/status:
+    get:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipInternalStatus'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Проверить статус стажировки (активна или нет)
+      tags:
+      - internal
   /internships:
     get:
       responses:

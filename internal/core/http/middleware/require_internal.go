@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func RequireAdminMiddleware(secretKey string) func(http.Handler) http.Handler {
+func RequireInternalMiddleware(secretKey string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			auth := r.Header.Get("Authorization")
@@ -17,30 +17,19 @@ func RequireAdminMiddleware(secretKey string) func(http.Handler) http.Handler {
 				w.Header().Set("WWW-Authenticate", "Bearer realm=\"API\"")
 				corehttp.RespondError(w, corehttp.APIError{
 					StatusCode: http.StatusUnauthorized,
-					Error:      "INVALID_TOKEN",
+					Error:      "INVALID_TOKEN_FORMAT",
 				})
 				return
 			}
 
 			token := strings.TrimPrefix(auth, prefix)
-			isAdmin, err := security.IsAdminRole(token, secretKey)
+			isInternal := security.IsValidInternal(token, secretKey)
 
-			if err != nil {
+			if !isInternal {
 				w.Header().Set("WWW-Authenticate", "Bearer realm=\"API\"")
 				corehttp.RespondError(w, corehttp.APIError{
 					StatusCode: http.StatusUnauthorized,
 					Error:      "INVALID_TOKEN",
-				})
-				return
-			}
-
-			if !isAdmin {
-				corehttp.RespondError(w, corehttp.APIError{
-					StatusCode: http.StatusForbidden,
-					Error:      "FORBIDDEN",
-					Details: map[string]any{
-						"reason": "NOT_ADMIN",
-					},
 				})
 				return
 			}

@@ -81,7 +81,7 @@ func Respond(w http.ResponseWriter, statusCode int, data any) {
 // @SecurityDefinitions.APIKey	Bearer
 // @In							header
 // @Name						Authorization
-// @Description					Формат: `Bearer jwt_token`
+// @Description					Формат: `Bearer {token}`
 func NewServer(port int, handler http.Handler) (*http.Server, error) {
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", port),

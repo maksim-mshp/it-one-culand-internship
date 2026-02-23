@@ -60,3 +60,19 @@ func NewGetByIDAdminHandler(repo app.Repository) *GetByIDAdminHandler {
 func (h *GetByIDAdminHandler) Handle(ctx context.Context, q app.GetByIDQuery) (*domain.Internship, error) {
 	return h.repo.GetByID(ctx, q.ID)
 }
+
+type CheckIsActiveHandler struct {
+	repo app.Repository
+}
+
+func NewCheckIsActiveHandler(repo app.Repository) *CheckIsActiveHandler {
+	return &CheckIsActiveHandler{repo: repo}
+}
+
+func (h *CheckIsActiveHandler) Handle(ctx context.Context, q app.CheckIsActiveQuery) (bool, error) {
+	internship, err := h.repo.GetByID(ctx, q.ID)
+	if err != nil {
+		return false, err
+	}
+	return internship.Status() == domain.StatusActive, nil
+}

@@ -30,3 +30,7 @@ type InternshipRequestDto struct {
 type InternshipStatusRequestDto struct {
 	Status *string `json:"status"`
 } // @name InternshipStatusRequestDto
+
+type InternshipInternalStatus struct {
+	IsActive bool `json:"isActive"`
+} // @name InternshipInternalStatus

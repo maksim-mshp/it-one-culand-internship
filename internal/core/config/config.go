@@ -14,8 +14,10 @@ type Database struct {
 }
 
 type Config struct {
-	Port     int `env:"PORT,required"`
-	Database Database
+	Port          int `env:"PORT,required"`
+	Database      Database
+	JWTToken      string `env:"JWT_TOKEN,required"`
+	InternalToken string `env:"INTERNAL_TOKEN,required"`
 }
 
 func Load() (*Config, error) {

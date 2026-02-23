@@ -24,3 +24,9 @@ func MapInternshipAdmin(i *domain.Internship) InternshipAdminDto {
 		Goals:       i.Info().Goals().Value(),
 	}
 }
+
+func MapInternshipInternalStatus(isActive bool) InternshipInternalStatus {
+	return InternshipInternalStatus{
+		IsActive: isActive,
+	}
+}
