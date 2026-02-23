@@ -32,7 +32,7 @@ func (h *GetByIDHandler) Handle(ctx context.Context, q app.GetByIDQuery) (*domai
 		return nil, err
 	}
 	if internship.Status() != domain.StatusActive {
-		return nil, domain.NewNotFoundError(q.ID)
+		return nil, domain.NotFoundError{ID: q.ID}
 	}
 	return internship, nil
 }

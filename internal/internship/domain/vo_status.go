@@ -30,7 +30,7 @@ func NewStatus(v string) (Status, error) {
 	case "ARCHIVE":
 		return StatusArchive, nil
 	}
-	return Status{}, NewInvalidStatusError(val, []string{"DRAFT", "ACTIVE", "ARCHIVE"})
+	return Status{}, InvalidStatusError{val, []string{"DRAFT", "ACTIVE", "ARCHIVE"}}
 }
 
 func (s Status) Value() string {

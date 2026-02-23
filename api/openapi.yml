@@ -8,6 +8,22 @@ components:
         error:
           type: string
       type: object
+    FAQDto:
+      properties:
+        answer:
+          type: string
+        id:
+          type: integer
+        question:
+          type: string
+      type: object
+    FAQRequestDto:
+      properties:
+        answer:
+          type: string
+        question:
+          type: string
+      type: object
     InternshipAdminDto:
       properties:
         description:
@@ -95,6 +111,176 @@ info:
   version: ""
 openapi: 3.1.0
 paths:
+  /admin/faq:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQRequestDto'
+              description: Часто задаваемый вопрос
+              summary: faq
+        description: Часто задаваемый вопрос
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: Created
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Создать часто задаваемый вопрос
+      tags:
+      - admin
+  /admin/faq/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Удалить часто задаваемый вопрос
+      tags:
+      - admin
+    patch:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQRequestDto'
+              description: Часто задаваемый вопрос
+              summary: faq
+        description: Часто задаваемый вопрос
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить часто задаваемый вопрос
+      tags:
+      - admin
+    put:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQRequestDto'
+              description: Часто задаваемый вопрос
+              summary: faq
+        description: Часто задаваемый вопрос
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить часто задаваемый вопрос
+      tags:
+      - admin
   /admin/internships:
     get:
       responses:
@@ -367,6 +553,51 @@ paths:
       summary: Обновить статус стажировки
       tags:
       - admin
+  /faq:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/FAQDto'
+                type: array
+          description: OK
+      summary: Получить все часто задаваемые вопросы
+      tags:
+      - faq
+  /faq/{id}:
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      summary: Получить часто задаваемый вопрос по ID
+      tags:
+      - faq
   /internal/internships/{id}/status:
     get:
       parameters:

@@ -2,47 +2,47 @@ package postgres
 
 const (
 	GetAllQuery = `
-        SELECT i.id,
-               i.title,
-               i.label,
-               i.description,
-               i.status,
-               COALESCE(s.skills_arr, '{}') AS skills,
-               COALESCE(g.goals_arr, '{}') AS goals
-        FROM internship.internships AS i
-                 LEFT JOIN (
-                      SELECT internship_id, ARRAY_AGG(skill_name ORDER BY id) AS skills_arr
-                      FROM internship.internship_skills
-                      GROUP BY internship_id
-                 ) AS s ON i.id = s.internship_id
-                 LEFT JOIN (
-                      SELECT internship_id, ARRAY_AGG(goal_name ORDER BY id) AS goals_arr
-                      FROM internship.internship_goals
-                      GROUP BY internship_id
-                 ) AS g ON i.id = g.internship_id
-        ORDER BY i.id;
+		SELECT i.id,
+			   i.title,
+			   i.label,
+			   i.description,
+			   i.status,
+			   COALESCE(s.skills_arr, '{}') AS skills,
+			   COALESCE(g.goals_arr, '{}') AS goals
+		FROM internship.internships AS i
+				 LEFT JOIN (
+					  SELECT internship_id, ARRAY_AGG(skill_name ORDER BY id) AS skills_arr
+					  FROM internship.internship_skills
+					  GROUP BY internship_id
+				 ) AS s ON i.id = s.internship_id
+				 LEFT JOIN (
+					  SELECT internship_id, ARRAY_AGG(goal_name ORDER BY id) AS goals_arr
+					  FROM internship.internship_goals
+					  GROUP BY internship_id
+				 ) AS g ON i.id = g.internship_id
+		ORDER BY i.id;
 	`
 
 	GetByIDQuery = `
-        SELECT i.id,
-               i.title,
-               i.label,
-               i.description,
-               i.status,
-               COALESCE(s.skills_arr, '{}') AS skills,
-               COALESCE(g.goals_arr, '{}') AS goals
-        FROM internship.internships AS i
-                 LEFT JOIN (
-                      SELECT internship_id, ARRAY_AGG(skill_name ORDER BY id) AS skills_arr
-                      FROM internship.internship_skills
-                      GROUP BY internship_id
-                 ) AS s ON i.id = s.internship_id
-                 LEFT JOIN (
-                      SELECT internship_id, ARRAY_AGG(goal_name ORDER BY id) AS goals_arr
-                      FROM internship.internship_goals
-                      GROUP BY internship_id
-                 ) AS g ON i.id = g.internship_id
-        WHERE i.id = $1;
+		SELECT i.id,
+			   i.title,
+			   i.label,
+			   i.description,
+			   i.status,
+			   COALESCE(s.skills_arr, '{}') AS skills,
+			   COALESCE(g.goals_arr, '{}') AS goals
+		FROM internship.internships AS i
+				 LEFT JOIN (
+					  SELECT internship_id, ARRAY_AGG(skill_name ORDER BY id) AS skills_arr
+					  FROM internship.internship_skills
+					  GROUP BY internship_id
+				 ) AS s ON i.id = s.internship_id
+				 LEFT JOIN (
+					  SELECT internship_id, ARRAY_AGG(goal_name ORDER BY id) AS goals_arr
+					  FROM internship.internship_goals
+					  GROUP BY internship_id
+				 ) AS g ON i.id = g.internship_id
+		WHERE i.id = $1;
 	`
 
 	CreateQuery = `
@@ -62,7 +62,7 @@ const (
 			SELECT new_internship.id, UNNEST($6::TEXT[])
 			FROM new_internship
 		)
-		SELECT id FROM new_internship
+		SELECT id FROM new_internship;
 	`
 
 	UpdateQuery = `
@@ -97,7 +97,7 @@ const (
 	`
 
 	GetByIDForUpdateQuery = `
-        WITH
+		WITH
 		locked AS (
 			SELECT id, title, label, description, status
 			FROM internship.internships
@@ -123,26 +123,26 @@ const (
 	`
 
 	GetAllActiveQuery = `
-        SELECT i.id,
-               i.title,
-               i.label,
-               i.description,
-               i.status,
-               COALESCE(s.skills_arr, '{}') AS skills,
-               COALESCE(g.goals_arr, '{}') AS goals
-        FROM internship.internships AS i
-                 LEFT JOIN (
-                      SELECT internship_id, ARRAY_AGG(skill_name ORDER BY id) AS skills_arr
-                      FROM internship.internship_skills
-                      GROUP BY internship_id
-                 ) AS s ON i.id = s.internship_id
-                 LEFT JOIN (
-                      SELECT internship_id, ARRAY_AGG(goal_name ORDER BY id) AS goals_arr
-                      FROM internship.internship_goals
-                      GROUP BY internship_id
-                 ) AS g ON i.id = g.internship_id
-        WHERE i.status = 'active'
-        ORDER BY i.id;
+		SELECT i.id,
+			   i.title,
+			   i.label,
+			   i.description,
+			   i.status,
+			   COALESCE(s.skills_arr, '{}') AS skills,
+			   COALESCE(g.goals_arr, '{}') AS goals
+		FROM internship.internships AS i
+				 LEFT JOIN (
+					  SELECT internship_id, ARRAY_AGG(skill_name ORDER BY id) AS skills_arr
+					  FROM internship.internship_skills
+					  GROUP BY internship_id
+				 ) AS s ON i.id = s.internship_id
+				 LEFT JOIN (
+					  SELECT internship_id, ARRAY_AGG(goal_name ORDER BY id) AS goals_arr
+					  FROM internship.internship_goals
+					  GROUP BY internship_id
+				 ) AS g ON i.id = g.internship_id
+		WHERE i.status = 'active'
+		ORDER BY i.id;
 	`
 
 	UpdateStatusQuery = `

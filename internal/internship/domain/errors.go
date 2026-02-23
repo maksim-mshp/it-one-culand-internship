@@ -5,12 +5,7 @@ import (
 )
 
 type NotFoundError struct {
-	ErrorCode string
-	ID        int
-}
-
-func NewNotFoundError(id int) NotFoundError {
-	return NotFoundError{"INTERNSHIP_NOT_FOUND", id}
+	ID int
 }
 
 func (e NotFoundError) Error() string {
@@ -18,17 +13,8 @@ func (e NotFoundError) Error() string {
 }
 
 type InvalidStatusError struct {
-	ErrorCode      string
 	Value          string
 	PossibleValues []string
-}
-
-func NewInvalidStatusError(value string, possible []string) InvalidStatusError {
-	return InvalidStatusError{
-		"INTERNSHIP_INVALID_STATUS",
-		value,
-		possible,
-	}
 }
 
 func (e InvalidStatusError) Error() string {

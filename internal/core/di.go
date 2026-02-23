@@ -6,6 +6,9 @@ import (
 	corehttp "culand-internship/internal/core/http"
 	"culand-internship/internal/core/http/middleware"
 	"culand-internship/internal/core/postgres"
+	faqApp "culand-internship/internal/faq/app/handlers"
+	faqV1Http "culand-internship/internal/faq/infra/http/v1"
+	faqPostgres "culand-internship/internal/faq/infra/postgres"
 	internshipApp "culand-internship/internal/internship/app/handlers"
 	internshipV1Http "culand-internship/internal/internship/infra/http/v1"
 	internshipPostgres "culand-internship/internal/internship/infra/postgres"
@@ -56,6 +59,12 @@ func Start(cfg *config.Config) (*App, error) {
 	internshipHandlers := internshipApp.BuildHandlers(internshipRepo, internshipTxRunner)
 	internshipV1HttpHandler := internshipV1Http.NewHttpHandler(internshipHandlers)
 	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler, adminMW, internalMW)
+
+	faqRepo := faqPostgres.NewRepository(db)
+	faqTxRunner := faqPostgres.NewTxRunner(coreTxManager)
+	faqHandlers := faqApp.BuildHandlers(faqRepo, faqTxRunner)
+	faqV1HttpHandler := faqV1Http.NewHttpHandler(faqHandlers)
+	faqV1Http.RegisterRoutes(mux, faqV1HttpHandler, adminMW)
 
 	srv, err := corehttp.NewServer(cfg.Port, handler)
 	if err != nil {
