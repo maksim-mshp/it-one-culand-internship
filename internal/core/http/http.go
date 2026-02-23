@@ -35,7 +35,6 @@ func ParseJSONBody(r *http.Request, data any) *APIError {
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodyBytes)
 
 	dec := json.NewDecoder(r.Body)
-	dec.DisallowUnknownFields()
 
 	if err := dec.Decode(data); err != nil {
 		var maxBytesErr *http.MaxBytesError
@@ -49,6 +48,7 @@ func ParseJSONBody(r *http.Request, data any) *APIError {
 	}
 
 	if err := dec.Decode(&struct{}{}); err != io.EOF {
+		log.Printf("failed to decode json: %v", err)
 		var maxBytesErr *http.MaxBytesError
 		if errors.As(err, &maxBytesErr) {
 			return &APIError{
@@ -76,16 +76,13 @@ func Respond(w http.ResponseWriter, statusCode int, data any) {
 	respondJSON(w, statusCode, data)
 }
 
-// @title Internships API
-// @Servers /api/v1
-func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
-	if err := registerSwagger(mux); err != nil {
-		return nil, err
-	}
-
-	handler := LoggingMiddleware(mux)
-	handler = HTTPErrorsMiddleware(handler)
-
+// @Title						Internships API
+// @Servers.Url					/api/v1
+// @SecurityDefinitions.APIKey	Bearer
+// @In							header
+// @Name						Authorization
+// @Description					Формат: `Bearer jwt_token`
+func NewServer(port int, handler http.Handler) (*http.Server, error) {
 	return &http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      handler,
@@ -95,7 +92,7 @@ func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
 	}, nil
 }
 
-func registerSwagger(mux *http.ServeMux) error {
+func RegisterSwagger(mux *http.ServeMux) error {
 	wd, err := os.Getwd()
 	if err != nil {
 		return err

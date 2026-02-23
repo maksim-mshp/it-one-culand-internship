@@ -4,7 +4,9 @@ import (
 	"context"
 	"culand-internship/internal/core"
 	"culand-internship/internal/core/config"
+	"errors"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,8 +34,10 @@ func main() {
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
 	select {
-	case err := <-serverErr:
-		log.Printf("server error: %v", err)
+	case err = <-serverErr:
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Printf("server error: %v", err)
+		}
 
 	case <-stop:
 		log.Println("shutdown signal received")

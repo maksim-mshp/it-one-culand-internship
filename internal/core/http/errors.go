@@ -1,6 +1,8 @@
 package http
 
 import (
+	"culand-internship/internal/core/validation"
+	"errors"
 	"net/http"
 )
 
@@ -24,7 +26,48 @@ var ErrInvalidBody = APIError{
 	Error:      "INVALID_BODY",
 }
 
-var ErrUnauthorized = APIError{
-	StatusCode: http.StatusUnauthorized,
-	Error:      "UNAUTHORIZED",
+func MapErrors(err error) *APIError {
+	var requiredFieldMissing validation.RequiredFieldMissingError
+	if errors.As(err, &requiredFieldMissing) {
+		return &APIError{
+			StatusCode: http.StatusUnprocessableEntity,
+			Error:      "REQUIRED_FIELD_MISSING",
+			Details: map[string]any{
+				"field": requiredFieldMissing.Field,
+			},
+		}
+	}
+
+	var invalidFieldLength validation.InvalidFieldLengthError
+	if errors.As(err, &invalidFieldLength) {
+		return &APIError{
+			StatusCode: http.StatusUnprocessableEntity,
+			Error:      "INVALID_FIELD_LENGTH",
+			Details: map[string]any{
+				"field":         invalidFieldLength.Field,
+				"value":         invalidFieldLength.Value,
+				"minLength":     invalidFieldLength.MinLength,
+				"maxLength":     invalidFieldLength.MaxLength,
+				"currentLength": invalidFieldLength.CurrentLength,
+			},
+		}
+	}
+
+	var invalidArrayItemLengthLength validation.InvalidArrayItemLengthError
+	if errors.As(err, &invalidArrayItemLengthLength) {
+		return &APIError{
+			StatusCode: http.StatusUnprocessableEntity,
+			Error:      "INVALID_ARRAY_ITEM_LENGTH",
+			Details: map[string]any{
+				"field":         invalidArrayItemLengthLength.Field,
+				"index":         invalidArrayItemLengthLength.Index,
+				"value":         invalidArrayItemLengthLength.Value,
+				"minLength":     invalidArrayItemLengthLength.MinLength,
+				"maxLength":     invalidArrayItemLengthLength.MaxLength,
+				"currentLength": invalidArrayItemLengthLength.CurrentLength,
+			},
+		}
+	}
+
+	return nil
 }

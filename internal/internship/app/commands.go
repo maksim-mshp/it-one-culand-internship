@@ -1,6 +1,6 @@
 package app
 
-type CreateInternshipCommand struct {
+type CreateCommand struct {
 	Title       *string
 	Label       *string
 	Description *string
@@ -8,11 +8,16 @@ type CreateInternshipCommand struct {
 	Goals       *[]string
 }
 
-type UpdateInternshipCommand struct {
+type UpdateCommand struct {
 	ID          int
 	Title       *string
 	Label       *string
 	Description *string
 	Skills      *[]string
 	Goals       *[]string
+}
+
+type UpdateStatusCommand struct {
+	ID     int
+	Status *string
 }

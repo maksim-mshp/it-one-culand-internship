@@ -2,36 +2,37 @@ package handlers
 
 import (
 	"context"
+	"culand-internship/internal/core/utils"
 	"culand-internship/internal/internship/app"
 	"culand-internship/internal/internship/domain"
 )
 
-type CreateInternshipHandler struct {
+type CreateHandler struct {
 	txRunner app.TxRunner
 }
 
-func NewCreateInternshipHandler(txRunner app.TxRunner) *CreateInternshipHandler {
-	return &CreateInternshipHandler{txRunner: txRunner}
+func NewCreateHandler(txRunner app.TxRunner) *CreateHandler {
+	return &CreateHandler{txRunner: txRunner}
 }
 
-func (h *CreateInternshipHandler) Handle(ctx context.Context, cmd app.CreateInternshipCommand) (*domain.Internship, error) {
-	title, err := domain.NewTitle(cmd.Title)
+func (h *CreateHandler) Handle(ctx context.Context, cmd app.CreateCommand) (*domain.Internship, error) {
+	title, err := utils.BuildVO(cmd.Title, domain.NewTitle)
 	if err != nil {
 		return nil, err
 	}
-	label, err := domain.NewLabel(cmd.Label)
+	label, err := utils.BuildVO(cmd.Label, domain.NewLabel)
 	if err != nil {
 		return nil, err
 	}
-	desc, err := domain.NewDescription(cmd.Description)
+	desc, err := utils.BuildVO(cmd.Description, domain.NewDescription)
 	if err != nil {
 		return nil, err
 	}
-	skills, err := domain.NewSkills(cmd.Skills)
+	skills, err := utils.BuildVO(cmd.Skills, domain.NewSkills)
 	if err != nil {
 		return nil, err
 	}
-	goals, err := domain.NewGoals(cmd.Goals)
+	goals, err := utils.BuildVO(cmd.Goals, domain.NewGoals)
 	if err != nil {
 		return nil, err
 	}

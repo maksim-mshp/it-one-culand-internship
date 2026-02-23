@@ -1,25 +1,17 @@
 package domain
 
 import (
-	"strings"
-	"unicode/utf8"
+	"culand-internship/internal/core/validation"
 )
 
 type Goals struct {
 	value []string
 }
 
-func NewGoals(v *[]string) (Goals, error) {
-	if v == nil {
-		return Goals{}, nil
-	}
-	val := *v
-	for i := range val {
-		val[i] = strings.TrimSpace(val[i])
-		n := utf8.RuneCountInString(val[i])
-		if n < 5 || n > 255 {
-			return Goals{}, NewInvalidFieldLengthError("goals", 5, 255, n)
-		}
+func NewGoals(v []string) (Goals, error) {
+	val, err := validation.ValidateSliceItemsLength("goals", v, 5, 200)
+	if err != nil {
+		return Goals{}, *err
 	}
 	return Goals{value: val}, nil
 }

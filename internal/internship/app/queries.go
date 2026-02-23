@@ -1,7 +1,7 @@
 package app
 
-type GetAllInternshipsQuery struct{}
+type GetAllQuery struct{}
 
-type GetInternshipByIDQuery struct {
+type GetByIDQuery struct {
 	ID int
 }

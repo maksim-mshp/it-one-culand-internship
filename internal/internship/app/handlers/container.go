@@ -5,19 +5,25 @@ import (
 )
 
 type Handlers struct {
-	GetAll  *GetAllInternshipsHandler
-	GetByID *GetInternshipByIDHandler
-	Create  *CreateInternshipHandler
-	Update  *UpdateInternshipHandler
-	Patch   *PatchInternshipHandler
+	GetAll       *GetAllHandler
+	GetByID      *GetByIDHandler
+	Create       *CreateHandler
+	Update       *UpdateHandler
+	Patch        *PatchHandler
+	GetAllAdmin  *GetAllAdminHandler
+	GetByIDAdmin *GetByIDAdminHandler
+	UpdateStatus *UpdateStatusHandler
 }
 
 func BuildHandlers(repo app.Repository, txRunner app.TxRunner) *Handlers {
 	return &Handlers{
-		GetAll:  NewGetAllInternshipsHandler(repo),
-		GetByID: NewGetInternshipByIDHandler(repo),
-		Create:  NewCreateInternshipHandler(txRunner),
-		Update:  NewUpdateInternshipHandler(txRunner),
-		Patch:   NewPatchInternshipHandler(txRunner),
+		GetAll:       NewGetAllHandler(repo),
+		GetByID:      NewGetByIDHandler(repo),
+		Create:       NewCreateHandler(txRunner),
+		Update:       NewUpdateHandler(txRunner),
+		Patch:        NewPatchHandler(txRunner),
+		GetAllAdmin:  NewGetAllAdminHandler(repo),
+		GetByIDAdmin: NewGetByIDAdminHandler(repo),
+		UpdateStatus: NewUpdateStatusHandler(txRunner),
 	}
 }

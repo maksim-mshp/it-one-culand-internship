@@ -8,29 +8,8 @@ import (
 )
 
 func mapError(err error) corehttp.APIError {
-	var fieldMissing domain.MissingFieldError
-	if errors.As(err, &fieldMissing) {
-		return corehttp.APIError{
-			StatusCode: http.StatusUnprocessableEntity,
-			Error:      fieldMissing.ErrorCode,
-			Details: map[string]any{
-				"field": fieldMissing.Field,
-			},
-		}
-	}
-
-	var invalidFieldLength domain.InvalidFieldLengthError
-	if errors.As(err, &invalidFieldLength) {
-		return corehttp.APIError{
-			StatusCode: http.StatusUnprocessableEntity,
-			Error:      invalidFieldLength.ErrorCode,
-			Details: map[string]any{
-				"field":         invalidFieldLength.Field,
-				"minLength":     invalidFieldLength.MinLength,
-				"maxLength":     invalidFieldLength.MaxLength,
-				"currentLength": invalidFieldLength.CurrentLength,
-			},
-		}
+	if apiErr := corehttp.MapErrors(err); apiErr != nil {
+		return *apiErr
 	}
 
 	var notFound domain.NotFoundError
@@ -40,6 +19,18 @@ func mapError(err error) corehttp.APIError {
 			Error:      notFound.ErrorCode,
 			Details: map[string]any{
 				"id": notFound.ID,
+			},
+		}
+	}
+
+	var invalidStatus domain.InvalidStatusError
+	if errors.As(err, &invalidStatus) {
+		return corehttp.APIError{
+			StatusCode: http.StatusUnprocessableEntity,
+			Error:      invalidStatus.ErrorCode,
+			Details: map[string]any{
+				"value":          invalidStatus.Value,
+				"possibleValues": invalidStatus.PossibleValues,
 			},
 		}
 	}

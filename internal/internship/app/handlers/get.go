@@ -6,26 +6,57 @@ import (
 	"culand-internship/internal/internship/domain"
 )
 
-type GetAllInternshipsHandler struct {
+type GetAllHandler struct {
 	repo app.Repository
 }
 
-func NewGetAllInternshipsHandler(repo app.Repository) *GetAllInternshipsHandler {
-	return &GetAllInternshipsHandler{repo: repo}
+func NewGetAllHandler(repo app.Repository) *GetAllHandler {
+	return &GetAllHandler{repo: repo}
 }
 
-func (h *GetAllInternshipsHandler) Handle(ctx context.Context, _ app.GetAllInternshipsQuery) ([]*domain.Internship, error) {
+func (h *GetAllHandler) Handle(ctx context.Context, _ app.GetAllQuery) ([]*domain.Internship, error) {
+	return h.repo.GetAllActive(ctx)
+}
+
+type GetByIDHandler struct {
+	repo app.Repository
+}
+
+func NewGetByIDHandler(repo app.Repository) *GetByIDHandler {
+	return &GetByIDHandler{repo: repo}
+}
+
+func (h *GetByIDHandler) Handle(ctx context.Context, q app.GetByIDQuery) (*domain.Internship, error) {
+	internship, err := h.repo.GetByID(ctx, q.ID)
+	if err != nil {
+		return nil, err
+	}
+	if internship.Status() != domain.StatusActive {
+		return nil, domain.NewNotFoundError(q.ID)
+	}
+	return internship, nil
+}
+
+type GetAllAdminHandler struct {
+	repo app.Repository
+}
+
+func NewGetAllAdminHandler(repo app.Repository) *GetAllAdminHandler {
+	return &GetAllAdminHandler{repo: repo}
+}
+
+func (h *GetAllAdminHandler) Handle(ctx context.Context, _ app.GetAllQuery) ([]*domain.Internship, error) {
 	return h.repo.GetAll(ctx)
 }
 
-type GetInternshipByIDHandler struct {
+type GetByIDAdminHandler struct {
 	repo app.Repository
 }
 
-func NewGetInternshipByIDHandler(repo app.Repository) *GetInternshipByIDHandler {
-	return &GetInternshipByIDHandler{repo: repo}
+func NewGetByIDAdminHandler(repo app.Repository) *GetByIDAdminHandler {
+	return &GetByIDAdminHandler{repo: repo}
 }
 
-func (h *GetInternshipByIDHandler) Handle(ctx context.Context, q app.GetInternshipByIDQuery) (*domain.Internship, error) {
+func (h *GetByIDAdminHandler) Handle(ctx context.Context, q app.GetByIDQuery) (*domain.Internship, error) {
 	return h.repo.GetByID(ctx, q.ID)
 }

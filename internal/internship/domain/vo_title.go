@@ -1,22 +1,20 @@
 package domain
 
 import (
-	"strings"
-	"unicode/utf8"
+	"culand-internship/internal/core/validation"
 )
 
 type Title struct {
 	value string
 }
 
-func NewTitle(v *string) (Title, error) {
-	if v == nil {
-		return Title{}, NewMissingFieldError("title")
-	}
-	val := strings.TrimSpace(*v)
-	n := utf8.RuneCountInString(val)
-	if n < 5 || n > 100 {
-		return Title{}, NewInvalidFieldLengthError("title", 5, 100, n)
+func NewTitle(v string) (Title, error) {
+	val, err := validation.ValidateStringLength("title", v, 5, 100)
+	if err != nil {
+		if err.CurrentLength == 0 {
+			return Title{}, validation.RequiredFieldMissingError{Field: "title"}
+		}
+		return Title{}, *err
 	}
 	return Title{value: val}, nil
 }

@@ -1,6 +1,6 @@
 version: 3
 
-dotenv: ['.env']
+dotenv: [ '.env' ]
 
 silent: true
 
@@ -17,4 +17,12 @@ tasks:
   install-deps:
     cmds:
       - go install github.com/swaggo/swag/v2/cmd/swag@latest
-      - go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+      - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+  migrate:
+    cmds:
+      - >
+        migrate
+        -path internal/core/postgres/migrations
+        -database postgres://{{.DB_USER}}:{{.DB_PASSWORD}}@{{.DB_HOST}}:{{.DB_PORT}}/{{.DB_DATABASE}}
+        {{.CLI_ARGS}}

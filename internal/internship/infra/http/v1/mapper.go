@@ -12,3 +12,15 @@ func MapInternship(i *domain.Internship) InternshipDto {
 		Goals:       i.Info().Goals().Value(),
 	}
 }
+
+func MapInternshipAdmin(i *domain.Internship) InternshipAdminDto {
+	return InternshipAdminDto{
+		ID:          i.ID(),
+		Status:      i.Status().Value(),
+		Title:       i.Info().Title().Value(),
+		Label:       i.Info().Label().Value(),
+		Description: i.Info().Description().Value(),
+		Skills:      i.Info().Skills().Value(),
+		Goals:       i.Info().Goals().Value(),
+	}
+}

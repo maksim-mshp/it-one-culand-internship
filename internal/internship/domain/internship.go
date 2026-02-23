@@ -1,13 +1,15 @@
 package domain
 
 type Internship struct {
-	id   int
-	info InternshipInfo
+	id     int
+	info   InternshipInfo
+	status Status
 }
 
 func NewInternship(info InternshipInfo) (Internship, error) {
 	return Internship{
-		info: info,
+		info:   info,
+		status: StatusDraft,
 	}, nil
 }
 
@@ -17,17 +19,26 @@ func (i *Internship) ID() int {
 func (i *Internship) Info() InternshipInfo {
 	return i.info
 }
+func (i *Internship) Status() Status {
+	return i.status
+}
 
 func (i *Internship) SetID(id int) {
 	i.id = id
 }
-func (i *Internship) UpdateInfo(info InternshipInfo) {
+func (i *Internship) UpdateInfo(info InternshipInfo) error {
 	i.info = info
+	return nil
+}
+func (i *Internship) ChangeStatus(status Status) error {
+	i.status = status
+	return nil
 }
 
-func ReconstituteInternship(id int, info InternshipInfo) Internship {
+func ReconstituteInternship(id int, info InternshipInfo, status Status) Internship {
 	return Internship{
-		id:   id,
-		info: info,
+		id:     id,
+		info:   info,
+		status: status,
 	}
 }

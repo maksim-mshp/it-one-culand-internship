@@ -4,6 +4,7 @@ import (
 	"context"
 	"culand-internship/internal/core/config"
 	corehttp "culand-internship/internal/core/http"
+	"culand-internship/internal/core/http/middleware"
 	"culand-internship/internal/core/postgres"
 	internshipApp "culand-internship/internal/internship/app/handlers"
 	internshipV1Http "culand-internship/internal/internship/infra/http/v1"
@@ -31,7 +32,13 @@ func Start(cfg *config.Config) (*App, error) {
 	mux := http.NewServeMux()
 	coreTxManager := postgres.NewPgxTxManager(db)
 
-	adminMW := corehttp.RequireAdminMiddleware()
+	if err = corehttp.RegisterSwagger(mux); err != nil {
+		return nil, err
+	}
+
+	adminMW := middleware.RequireAdminMiddleware()
+	handler := middleware.LoggingMiddleware(mux)
+	handler = middleware.HTTPErrorsMiddleware(handler)
 
 	internshipRepo := internshipPostgres.NewRepository(db)
 	internshipTxRunner := internshipPostgres.NewTxRunner(coreTxManager)
@@ -39,7 +46,7 @@ func Start(cfg *config.Config) (*App, error) {
 	internshipV1HttpHandler := internshipV1Http.NewHttpHandler(internshipHandlers)
 	internshipV1Http.RegisterRoutes(mux, internshipV1HttpHandler, adminMW)
 
-	srv, err := corehttp.NewServer(cfg.Port, mux)
+	srv, err := corehttp.NewServer(cfg.Port, handler)
 	if err != nil {
 		return nil, err
 	}

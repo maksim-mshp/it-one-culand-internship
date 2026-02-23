@@ -1,25 +1,17 @@
 package domain
 
 import (
-	"strings"
-	"unicode/utf8"
+	"culand-internship/internal/core/validation"
 )
 
 type Skills struct {
 	value []string
 }
 
-func NewSkills(v *[]string) (Skills, error) {
-	if v == nil {
-		return Skills{}, nil
-	}
-	val := *v
-	for i := range val {
-		val[i] = strings.TrimSpace(val[i])
-		n := utf8.RuneCountInString(val[i])
-		if n < 5 || n > 255 {
-			return Skills{}, NewInvalidFieldLengthError("skills", 5, 255, n)
-		}
+func NewSkills(v []string) (Skills, error) {
+	val, err := validation.ValidateSliceItemsLength("skills", v, 5, 200)
+	if err != nil {
+		return Skills{}, *err
 	}
 	return Skills{value: val}, nil
 }
