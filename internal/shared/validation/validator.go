@@ -15,7 +15,7 @@ func ValidateStringLength(field string, v string, min, max int) (string, *Invali
 }
 
 func ValidateSliceItemsLength(field string, arr []string, min, max int) ([]string, *InvalidArrayItemLengthError) {
-	var result []string
+	result := make([]string, 0, len(arr))
 	for i, v := range arr {
 		val := strings.TrimSpace(v)
 		n := utf8.RuneCountInString(val)

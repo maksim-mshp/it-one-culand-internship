@@ -12,7 +12,7 @@ func RequireAdminMiddleware(secretKey string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			parts := strings.Fields(r.Header.Get("Authorization"))
 
-			if len(parts) < 2 || !strings.EqualFold(parts[0], "Bearer") {
+			if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
 				w.Header().Set("WWW-Authenticate", "Bearer realm=\"API\"")
 				corehttp.RespondError(w, corehttp.APIError{
 					StatusCode: http.StatusUnauthorized,

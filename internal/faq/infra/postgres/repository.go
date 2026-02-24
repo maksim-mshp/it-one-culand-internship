@@ -35,7 +35,7 @@ func (r *Repository) GetAll(ctx context.Context) ([]*domain.FAQ, error) {
 		}
 
 		question := utils.ReconstituteVO(q, domain.ReconstituteQuestion)
-		answer := utils.ReconstituteVO(q, domain.ReconstituteAnswer)
+		answer := utils.ReconstituteVO(a, domain.ReconstituteAnswer)
 		faq := domain.ReconstituteFAQ(id, question, answer)
 
 		return &faq, nil
@@ -59,7 +59,7 @@ func (r *Repository) GetByID(ctx context.Context, id int) (*domain.FAQ, error) {
 	}
 
 	question := utils.ReconstituteVO(q, domain.ReconstituteQuestion)
-	answer := utils.ReconstituteVO(q, domain.ReconstituteAnswer)
+	answer := utils.ReconstituteVO(a, domain.ReconstituteAnswer)
 	faq := domain.ReconstituteFAQ(id, question, answer)
 
 	return &faq, nil
@@ -110,7 +110,7 @@ func (r *Repository) GetByIDForUpdate(ctx context.Context, id int) (*domain.FAQ,
 	}
 
 	question := utils.ReconstituteVO(q, domain.ReconstituteQuestion)
-	answer := utils.ReconstituteVO(q, domain.ReconstituteAnswer)
+	answer := utils.ReconstituteVO(a, domain.ReconstituteAnswer)
 	faq := domain.ReconstituteFAQ(id, question, answer)
 
 	return &faq, nil

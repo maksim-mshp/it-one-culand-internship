@@ -6,16 +6,17 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"net/url"
 )
 
 func MakeConnectionString(config config.Database) string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
-		config.User,
-		config.Password,
-		config.Host,
-		config.Port,
-		config.Database,
-	)
+	u := url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(config.User, config.Password),
+		Host:   fmt.Sprintf("%s:%d", config.Host, config.Port),
+		Path:   config.Database,
+	}
+	return u.String()
 }
 
 func NewPostgres(config config.Database) (*pgxpool.Pool, error) {

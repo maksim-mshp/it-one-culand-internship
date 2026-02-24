@@ -29,7 +29,7 @@ const (
 	GetByIDForUpdateQuery = `
 		SELECT id, question, answer
 		FROM internship.faq
-		ORDER BY id
+		WHERE id = $1
 		FOR UPDATE;
 	`
 

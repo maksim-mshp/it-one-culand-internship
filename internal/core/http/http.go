@@ -72,6 +72,10 @@ func respondJSON(w http.ResponseWriter, statusCode int, body any) {
 }
 
 func Respond(w http.ResponseWriter, statusCode int, data any) {
+	if statusCode == http.StatusNoContent {
+		w.WriteHeader(statusCode)
+		return
+	}
 	respondJSON(w, statusCode, data)
 }
 
