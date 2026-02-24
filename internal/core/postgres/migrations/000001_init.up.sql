@@ -41,3 +41,10 @@ CREATE TABLE IF NOT EXISTS internship.faq (
     question VARCHAR(500) NOT NULL,
     answer   VARCHAR(500) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS internship.review (
+    id       SERIAL PRIMARY KEY,
+    text     VARCHAR(500) NOT NULL,
+    author   VARCHAR(100) NOT NULL,
+    position VARCHAR(100) NOT NULL
+);

@@ -12,6 +12,9 @@ import (
 	internshipApp "culand-internship/internal/internship/app/handlers"
 	internshipV1Http "culand-internship/internal/internship/infra/http/v1"
 	internshipPostgres "culand-internship/internal/internship/infra/postgres"
+	reviewApp "culand-internship/internal/review/app/handlers"
+	reviewV1Http "culand-internship/internal/review/infra/http/v1"
+	reviewPostgres "culand-internship/internal/review/infra/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http"
 	"time"
@@ -65,6 +68,12 @@ func Start(cfg *config.Config) (*App, error) {
 	faqHandlers := faqApp.BuildHandlers(faqRepo, faqTxRunner)
 	faqV1HttpHandler := faqV1Http.NewHttpHandler(faqHandlers)
 	faqV1Http.RegisterRoutes(mux, faqV1HttpHandler, adminMW)
+
+	reviewRepo := reviewPostgres.NewRepository(db)
+	reviewTxRunner := reviewPostgres.NewTxRunner(coreTxManager)
+	reviewHandlers := reviewApp.BuildHandlers(reviewRepo, reviewTxRunner)
+	reviewV1HttpHandler := reviewV1Http.NewHttpHandler(reviewHandlers)
+	reviewV1Http.RegisterRoutes(mux, reviewV1HttpHandler, adminMW)
 
 	srv, err := corehttp.NewServer(cfg.Port, handler)
 	if err != nil {

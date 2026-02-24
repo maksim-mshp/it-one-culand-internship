@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS internship.review;
 DROP TABLE IF EXISTS internship.faq;
 
 DROP TABLE IF EXISTS internship.internship_goals;
