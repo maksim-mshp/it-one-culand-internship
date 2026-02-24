@@ -1,6 +1,7 @@
 package http
 
 import (
+	embed "culand-internship"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,8 +10,6 @@ import (
 	"log"
 	"mime"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -93,16 +92,11 @@ func NewServer(port int, handler http.Handler) (*http.Server, error) {
 }
 
 func RegisterSwagger(mux *http.ServeMux) error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	apiDir := filepath.Join(wd, "api")
 	mux.HandleFunc("/swagger/openapi.json", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(apiDir, "openapi.json"))
+		http.ServeFileFS(w, r, embed.OpenAPIFS, "api/openapi.json")
 	})
 	mux.HandleFunc("/swagger/openapi.yml", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(apiDir, "openapi.yml"))
+		http.ServeFileFS(w, r, embed.OpenAPIFS, "api/openapi.yml")
 	})
 	mux.Handle("/swagger/", httpSwagger.Handler(
 		httpSwagger.URL("/swagger/openapi.json"),

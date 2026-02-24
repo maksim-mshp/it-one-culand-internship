@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"culand-internship/internal/shared/validation"
-)
+import "culand-internship/internal/shared/validation"
 
 type Label struct {
 	value string

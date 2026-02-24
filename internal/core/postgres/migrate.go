@@ -3,13 +3,17 @@ package postgres
 import (
 	"culand-internship/internal/core/config"
 	"database/sql"
+	"embed"
 	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"log"
 )
+
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
 
 func RunMigrations(config config.Database) error {
 	dsn := MakeConnectionString(config)
@@ -30,8 +34,15 @@ func RunMigrations(config config.Database) error {
 		return fmt.Errorf("failed to create postgres driver: %w", err)
 	}
 
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://internal/core/postgres/migrations",
+	sourceDriver, err := iofs.New(migrationsFS, "migrations")
+	if err != nil {
+		_ = db.Close()
+		return fmt.Errorf("failed to create migration source driver: %w", err)
+	}
+
+	m, err := migrate.NewWithInstance(
+		"iofs",
+		sourceDriver,
 		"postgres",
 		driver,
 	)

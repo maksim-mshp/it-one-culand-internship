@@ -1,8 +1,6 @@
 package handlers
 
-import (
-	"culand-internship/internal/internship/app"
-)
+import "culand-internship/internal/internship/app"
 
 type Handlers struct {
 	GetAll        *GetAllHandler

@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type NotFoundError struct {
 	ID int

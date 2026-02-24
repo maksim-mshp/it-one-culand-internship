@@ -6,11 +6,11 @@ import (
 )
 
 type Database struct {
-	Host     string `env:"DB_HOST,required"`
-	Port     int    `env:"DB_PORT,required"`
-	User     string `env:"DB_USER,required"`
-	Password string `env:"DB_PASSWORD,required"`
-	Database string `env:"DB_DATABASE,required"`
+	Host     string `env:"POSTGRES_HOST,required"`
+	Port     int    `env:"POSTGRES_PORT,required"`
+	User     string `env:"POSTGRES_USER,required"`
+	Password string `env:"POSTGRES_PASSWORD,required"`
+	Database string `env:"POSTGRES_DATABASE,required"`
 }
 
 type Config struct {

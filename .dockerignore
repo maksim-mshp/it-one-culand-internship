@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+.vscode
+Dockerfile
+docker-compose.yml
+.dockerignore
+.env
+.env.example
+README.md
+Taskfile.yml
