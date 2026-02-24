@@ -97,14 +97,11 @@ func NewServer(port int, handler http.Handler) (*http.Server, error) {
 }
 
 func RegisterSwagger(mux *http.ServeMux) error {
-	mux.HandleFunc("/swagger/openapi.json", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFileFS(w, r, embed.OpenAPIFS, "api/openapi.json")
-	})
 	mux.HandleFunc("/swagger/openapi.yml", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFileFS(w, r, embed.OpenAPIFS, "api/openapi.yml")
 	})
 	mux.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("/swagger/openapi.json"),
+		httpSwagger.URL("/swagger/openapi.yml"),
 	))
 	return nil
 }
