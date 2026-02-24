@@ -1,21 +1,67 @@
 package http
 
 import (
-	"culand-internship/internal/core/http/middleware"
+	embed "culand-internship"
 	"encoding/json"
+	"errors"
 	"fmt"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
+	"io"
 	"log"
+	"mime"
 	"net/http"
-	"os"
-	"path/filepath"
+	"time"
 )
 
-type ErrorResponse struct {
-	Error string `json:"error"`
+func ParseJSONBody(r *http.Request, data any) *APIError {
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			log.Printf("failed to close body reader: %v", err)
+		}
+	}()
+
+	if ct := r.Header.Get("Content-Type"); ct != "" {
+		mediaType, _, err := mime.ParseMediaType(ct)
+		if err != nil || mediaType != "application/json" {
+			return &APIError{
+				StatusCode: http.StatusUnsupportedMediaType,
+				Error:      "UNSUPPORTED_MEDIA_TYPE",
+			}
+		}
+	}
+
+	const maxBodyBytes = 1024 * 1024
+	r.Body = http.MaxBytesReader(nil, r.Body, maxBodyBytes)
+
+	dec := json.NewDecoder(r.Body)
+
+	if err := dec.Decode(data); err != nil {
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			return &APIError{
+				StatusCode: http.StatusRequestEntityTooLarge,
+				Error:      "REQUEST_ENTITY_TOO_LARGE",
+			}
+		}
+		return &ErrInvalidBody
+	}
+
+	if err := dec.Decode(&struct{}{}); err != io.EOF {
+		log.Printf("failed to decode json: %v", err)
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			return &APIError{
+				StatusCode: http.StatusRequestEntityTooLarge,
+				Error:      "REQUEST_ENTITY_TOO_LARGE",
+			}
+		}
+		return &ErrInvalidBody
+	}
+
+	return nil
 }
 
-func respondJSON(w http.ResponseWriter, statusCode int, body interface{}) {
+func respondJSON(w http.ResponseWriter, statusCode int, body any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	if body != nil {
@@ -25,46 +71,37 @@ func respondJSON(w http.ResponseWriter, statusCode int, body interface{}) {
 	}
 }
 
-func RespondError(w http.ResponseWriter, statusCode int, msg string) {
-	respondJSON(w, statusCode, ErrorResponse{Error: msg})
-}
-
-func RespondSuccess(w http.ResponseWriter, statusCode int, data interface{}) {
+func Respond(w http.ResponseWriter, statusCode int, data any) {
+	if statusCode == http.StatusNoContent {
+		w.WriteHeader(statusCode)
+		return
+	}
 	respondJSON(w, statusCode, data)
 }
 
-// @title Internship API
-// @BasePath /api/v1
-func NewServer(port int, mux *http.ServeMux) (*http.Server, error) {
-	if err := registerSwagger(mux); err != nil {
-		return nil, err
-	}
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		RespondError(w, http.StatusNotFound, "not found")
-	})
-
-	handler := middleware.Logging(mux)
-
+// @Title						Internships API
+// @Description					API сервиса стажировок. Для очистки необязательного поля нужно передать в методе `PATCH` пустую строку.
+// @Servers.Url					/api/v1
+// @SecurityDefinitions.APIKey	Bearer
+// @In							header
+// @Name						Authorization
+// @Description					Формат: `Bearer {token}`
+func NewServer(port int, handler http.Handler) (*http.Server, error) {
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: handler,
+		Addr:         fmt.Sprintf(":%d", port),
+		Handler:      handler,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}, nil
 }
 
-func registerSwagger(mux *http.ServeMux) error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	apiDir := filepath.Join(wd, "api")
-	mux.HandleFunc("/swagger/openapi.json", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(apiDir, "openapi.json"))
-	})
+func RegisterSwagger(mux *http.ServeMux) error {
 	mux.HandleFunc("/swagger/openapi.yml", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(apiDir, "openapi.yml"))
+		http.ServeFileFS(w, r, embed.OpenAPIFS, "api/openapi.yml")
 	})
 	mux.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("/swagger/openapi.json"),
+		httpSwagger.URL("/swagger/openapi.yml"),
 	))
 	return nil
 }

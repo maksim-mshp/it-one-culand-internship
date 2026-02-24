@@ -1,30 +1,923 @@
-basePath: /api/v1
-definitions:
-  Internship:
-    properties:
-      id:
-        type: integer
-      title:
-        type: string
-    type: object
+components:
+  schemas:
+    APIError:
+      properties:
+        details:
+          additionalProperties: {}
+          type: object
+        error:
+          type: string
+      type: object
+    FAQDto:
+      properties:
+        answer:
+          type: string
+        id:
+          type: integer
+        question:
+          type: string
+      type: object
+    FAQRequestDto:
+      properties:
+        answer:
+          type: string
+        question:
+          type: string
+      type: object
+    InternshipAdminDto:
+      properties:
+        description:
+          type: string
+        goals:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        id:
+          type: integer
+        label:
+          type: string
+        skills:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        status:
+          type: string
+        title:
+          type: string
+      type: object
+    InternshipDto:
+      properties:
+        description:
+          type: string
+        goals:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        id:
+          type: integer
+        label:
+          type: string
+        skills:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        title:
+          type: string
+      type: object
+    InternshipInternalStatus:
+      properties:
+        isActive:
+          type: boolean
+      type: object
+    InternshipRequestDto:
+      properties:
+        description:
+          type: string
+        goals:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        label:
+          type: string
+        skills:
+          items:
+            type: string
+          type: array
+          uniqueItems: false
+        title:
+          type: string
+      type: object
+    InternshipStatusRequestDto:
+      properties:
+        status:
+          type: string
+      type: object
+    ReviewDto:
+      properties:
+        author:
+          type: string
+        id:
+          type: integer
+        position:
+          type: string
+        text:
+          type: string
+      type: object
+    ReviewRequestDto:
+      properties:
+        author:
+          type: string
+        position:
+          type: string
+        text:
+          type: string
+      type: object
+  securitySchemes:
+    Bearer:
+      description: 'Формат: `Bearer {token}`'
+      in: header
+      name: Authorization
+      type: apiKey
+externalDocs:
+  description: ""
+  url: ""
 info:
-  contact: {}
-  title: Internship API
+  description: API сервиса стажировок. Для очистки необязательного поля нужно передать
+    в методе `PATCH` пустую строку.
+  title: Internships API
+  version: ""
+openapi: 3.1.0
 paths:
-  /api/v1/internships:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
+  /admin/faq:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQRequestDto'
+              description: Часто задаваемый вопрос
+              summary: faq
+        description: Часто задаваемый вопрос
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: Created
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Создать часто задаваемый вопрос
+      tags:
+      - admin
+  /admin/faq/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Удалить часто задаваемый вопрос
+      tags:
+      - admin
+    patch:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQRequestDto'
+              description: Часто задаваемый вопрос
+              summary: faq
+        description: Часто задаваемый вопрос
+        required: true
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
           description: OK
-          schema:
-            items:
-              $ref: '#/definitions/Internship'
-            type: array
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить часто задаваемый вопрос
+      tags:
+      - admin
+    put:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FAQRequestDto'
+              description: Часто задаваемый вопрос
+              summary: faq
+        description: Часто задаваемый вопрос
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить часто задаваемый вопрос
+      tags:
+      - admin
+  /admin/internships:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InternshipAdminDto'
+                type: array
+          description: OK
+      security:
+      - Bearer: []
+      summary: Получить все стажировки
+      tags:
+      - admin
+    post:
+      description: Стажировка создаётся со статусом DRAFT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipRequestDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipAdminDto'
+          description: Created
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Создать стажировку
+      tags:
+      - admin
+  /admin/internships/{id}:
+    delete:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Удалить стажировку
+      tags:
+      - admin
+    get:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipAdminDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Получить стажировку по ID
+      tags:
+      - admin
+    patch:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipRequestDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipAdminDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить стажировку
+      tags:
+      - admin
+    put:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipRequestDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipAdminDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить стажировку
+      tags:
+      - admin
+  /admin/internships/{id}/status:
+    put:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternshipStatusRequestDto'
+              description: Стажировка
+              summary: internship
+        description: Стажировка
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipAdminDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить статус стажировки
+      tags:
+      - admin
+  /admin/review:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequestDto'
+              description: Отзыв
+              summary: review
+        description: Отзыв
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDto'
+          description: Created
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Создать отзыв
+      tags:
+      - admin
+  /admin/review/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Удалить отзыв
+      tags:
+      - admin
+    patch:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequestDto'
+              description: Отзыв
+              summary: review
+        description: Отзыв
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить отзыв
+      tags:
+      - admin
+    put:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequestDto'
+              description: Отзыв
+              summary: review
+        description: Отзыв
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unprocessable Entity
+      security:
+      - Bearer: []
+      summary: Обновить отзыв
+      tags:
+      - admin
+  /faq:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/FAQDto'
+                type: array
+          description: OK
+      summary: Получить все часто задаваемые вопросы
+      tags:
+      - faq
+  /faq/{id}:
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FAQDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      summary: Получить часто задаваемый вопрос по ID
+      tags:
+      - faq
+  /internal/internships/{id}/status:
+    get:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipInternalStatus'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      security:
+      - Bearer: []
+      summary: Проверить статус стажировки (активна или нет)
+      tags:
+      - internal
+  /internships:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InternshipDto'
+                type: array
+          description: OK
       summary: Получить все стажировки
       tags:
       - internship
-swagger: "2.0"
+  /internships/{id}:
+    get:
+      parameters:
+      - description: ID стажировки
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternshipDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      summary: Получить стажировку по ID
+      tags:
+      - internship
+  /review:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReviewDto'
+                type: array
+          description: OK
+      summary: Получить все отзывы
+      tags:
+      - review
+  /review/{id}:
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDto'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          description: Not Found
+      summary: Получить отзыв по ID
+      tags:
+      - review
+servers:
+- url: /api/v1

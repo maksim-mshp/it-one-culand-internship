@@ -1,0 +1,27 @@
+version: 3
+
+dotenv: ['.env']
+
+silent: true
+
+tasks:
+  run:
+    cmd: go run ./cmd/internship | true
+
+  openapi:
+    cmds:
+      - swag init -g internal/core/http/http.go --output api --outputTypes yaml --v3.1
+      - mv api/swagger.yaml api/openapi.yml
+
+  install-deps:
+    cmds:
+      - go install github.com/swaggo/swag/v2/cmd/swag@latest
+      - go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+  migrate:
+    cmds:
+      - >
+        migrate
+        -path internal/core/postgres/migrations
+        -database postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DATABASE}}
+        {{.CLI_ARGS}}
