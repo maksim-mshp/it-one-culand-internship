@@ -80,6 +80,7 @@ func Respond(w http.ResponseWriter, statusCode int, data any) {
 }
 
 // @Title						Internships API
+// @Description					API сервиса стажировок. Для очистки необязательного поля нужно передать в методе `PATCH` пустую строку.
 // @Servers.Url					/api/v1
 // @SecurityDefinitions.APIKey	Bearer
 // @In							header

@@ -127,6 +127,8 @@ externalDocs:
   description: ""
   url: ""
 info:
+  description: API сервиса стажировок. Для очистки необязательного поля нужно передать
+    в методе `PATCH` пустую строку.
   title: Internships API
   version: ""
 openapi: 3.1.0
